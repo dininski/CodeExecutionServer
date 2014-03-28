@@ -7,8 +7,16 @@ var ContainerManagement = function(options) {
 }
 
 ContainerManagement.prototype = {
-    init: function(initOptions) {
-        this._dockerode = new Docker(initOptions);
+    init: function(opts) {
+        this._dockerode = new Docker(opts);
+    },
+
+    createContainer: function(opts, done) {
+        this._dockerode.createContainer(opts, done);
+    },
+
+    getContainer: function(id) {
+        return this._dockerode.getContainer(id);
     }
 }
 

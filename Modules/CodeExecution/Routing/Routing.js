@@ -7,14 +7,13 @@ Routing.prototype = {
     registerRoutes: function (httpServer) {
         httpServer.registerRoute({
             method: 'post',
-            path: '/code/execute',
+            path: '/code',
             handler: this.handleCodeExecuteRequest.bind(this)
         });
     },
 
     handleCodeExecuteRequest: function (req, res, next) {
-        console.log(123);
-        res.send('Received!');
+        // TODO - handle code execution request
     }
 }
 
