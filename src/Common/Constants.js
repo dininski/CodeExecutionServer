@@ -2,7 +2,7 @@
 
 var Constants = {};
 
-Constants.Language = {
+Constants.Languages = {
     "Python": 1
 };
 
