@@ -22,10 +22,11 @@ Routing.prototype = {
     },
 
     handleCodeExecuteRequest: function (req, res, next) {
+        var language = parseInt(req.body.language, 10);
         var self = this;
         var timeLimit = 1000;
-        var code = '1\n2\n';
-        this._codeExecutionService.execute(code, 1, {timeLimit: timeLimit}, function(err, result) {
+        var argsString = '1\n2\n';
+        this._codeExecutionService.execute(argsString, language, {timeLimit: timeLimit}, function(err, result) {
             self._httpServer.respondJSON(req, res, result);
         });
     }

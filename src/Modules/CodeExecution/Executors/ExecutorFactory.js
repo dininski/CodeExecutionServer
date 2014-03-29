@@ -1,6 +1,7 @@
 'use strict';
 
 var PythonExecutor = require('./PythonExecutor');
+var PhpExecutor = require('./PhpExecutor');
 
 var ExecutorFactory = function () {
     this._languages;
@@ -22,6 +23,13 @@ ExecutorFactory.prototype = {
                 pythonExecutor.init(this._containerFactory, pythonOptions.createOptions, pythonOptions.runOptions);
 
                 return pythonExecutor;
+
+            case this._languages.Php:
+                var phpOptions = this._executorOptions.Php;
+                var phpExecutor = new PhpExecutor();
+                phpExecutor.init(this._containerFactory, phpOptions.createOptions, phpOptions.runOptions);
+
+                return phpExecutor;
         }
     }
 }

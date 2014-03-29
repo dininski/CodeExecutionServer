@@ -31,13 +31,13 @@ BaseExecutor.prototype = {
         this._container.start(this._containerRunOptions, done);
     },
 
-    execute: function (code, executionOptions, done) {
+    execute: function (args, executionOptions, done) {
         var timeLimit = executionOptions.timeLimit;
 
         var self = this;
         async.waterfall([
             function createContainerDlg(callback) {
-                self.initializeExecution(callback);
+                BaseExecutor.prototype.initializeExecution.call(self, callback);
             },
 
             function onContainerCreateDlg(callback) {
@@ -57,7 +57,7 @@ BaseExecutor.prototype = {
                         executionTime: executionTime
                     }
 
-                    self._cleanup(result, done);
+                    BaseExecutor.prototype._cleanup.call(self, result, done);
                 });
 
                 self._container.demuxStream(stream, function onStreamProcessDlg(stdoutStream, stderrStream) {
@@ -65,13 +65,13 @@ BaseExecutor.prototype = {
                     stderr = stderrStream;
                 });
 
-                stream.write(code);
+                stream.write(args);
 
                 callback();
             },
 
             function containerStartDlg(callback) {
-                self.beginExecution(callback);
+                BaseExecutor.prototype.beginExecution.call(self, callback);
             },
 
             function onContainerStarted(data, callback) {

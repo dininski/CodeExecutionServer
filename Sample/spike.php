@@ -1,5 +1,3 @@
-
-
 <?php
 
 function solve($param) {
@@ -24,22 +22,12 @@ function solve($param) {
         return 4;
     }
 }
+
 ?>
-<!-- 
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title></title>
-    </head>
-    <body>
-        <h1>
-            <?php
-            // echo solve(array(
-            //     0 => "-123.312",
-            //     1 => "-132.231231232"
-            // ));
-            ?>
-        </h1>
-    </body>
-</html>
- -->
+
+<?php $arguments = array();
+    array_push($arguments, 2); 
+    array_push($arguments, 1); 
+
+    echo solve($arguments);
+?>

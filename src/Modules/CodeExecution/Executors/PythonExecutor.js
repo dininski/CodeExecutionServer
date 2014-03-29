@@ -7,9 +7,6 @@ var PythonExecutor = function() {
 }
 
 PythonExecutor.prototype = {
-    init: function(containerFactory, createOpts, runOpts) {
-        BaseExecutor.prototype.init.call(this, containerFactory, createOpts, runOpts);
-    }
 }
 
 util.inherits(PythonExecutor, BaseExecutor);
