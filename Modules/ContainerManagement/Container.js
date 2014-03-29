@@ -1,9 +1,6 @@
 'use strict';
 
-var Docker = require('dockerode');
-
 var Container = function(options) {
-    this._dockerode;
     this._dockerContainer;
 }
 
@@ -12,16 +9,20 @@ Container.prototype = {
         this._dockerContainer = container;
     },
 
-    start: function() {
-
+    start: function(opts, done) {
+        this._dockerContainer.start(done);
     },
 
-    kill: function() {
-
+    kill: function(done) {
+        this._dockerContainer.kill(done);
     },
 
-    getOutput: function() {
+    remove: function(done) {
+        this._dockerContainer.remove(done);
+    },
 
+    getOutput: function(opts, done) {
+        this._dockerContainer.attach(opts, done);
     }
 }
 
