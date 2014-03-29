@@ -5,7 +5,6 @@
         "dockerode": "1.2.5",
         "express": "3.5.1",
         "architect": "0.1.11",
-        "async": "0.2.10",
-        "readable-stream": "~1.0.0"
+        "async": "0.2.10"
     }
 }

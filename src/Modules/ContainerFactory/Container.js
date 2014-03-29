@@ -25,18 +25,29 @@ Container.prototype = {
 
     getStream: function (done) {
         // TODO extract in constants/config
-        this._dockerContainer.attach({stream: true, stdin: true, stdout: true, stderr: true, tty: false}, done);
+        this._dockerContainer.attach({stream: true, logs: true, stdin: true, stdout: true, stderr: true, tty: false}, done);
     },
 
     demuxStream: function(stream, done) {
-        var stdout = new ReadableStream();
-        var stderr = new ReadableStream();
+        var stdout = new StreamMock();
+        var stderr = new StreamMock();
         this._dockerContainer.modem.demuxStream(stream, stdout, stderr);
         done(stdout, stderr);
     },
 
     getOutput: function (opts, done) {
         this._dockerContainer.attach(opts, done);
+    }
+}
+
+// TODO - refactor and update
+var StreamMock = function() {
+    this.value = '';
+}
+
+StreamMock.prototype = {
+    write: function(data) {
+        this.value += data.toString();
     }
 }
 

@@ -23,8 +23,10 @@ Routing.prototype = {
 
     handleCodeExecuteRequest: function (req, res, next) {
         var timeLimit = 1000;
-        this._codeExecutionService.execute('1\n2\n', 1, {timeLimit: timeLimit}, function(stdout, stderr) {
-
+        var code = '1\n2\n';
+        this._codeExecutionService.execute(code, 1, {timeLimit: timeLimit}, function(err, result) {
+            res.setHeader('Content-type', 'application-json');
+            res.send(JSON.stringify(result));
         });
     }
 }

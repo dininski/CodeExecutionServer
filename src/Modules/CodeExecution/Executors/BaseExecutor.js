@@ -4,33 +4,34 @@ var async = require('async');
 var startTime;
 var endTime;
 
-var BaseExecutor = function() {
+var BaseExecutor = function () {
     this._containerFactory;
     this._containerCreateOptions;
     this._containerRunOptions;
     this._container;
+    this.timer;
 }
 
 BaseExecutor.prototype = {
-    init: function(containerFactory, containerCreateOptions, containerRunOptions) {
+    init: function (containerFactory, containerCreateOptions, containerRunOptions) {
         this._containerFactory = containerFactory;
         this._containerCreateOptions = containerCreateOptions;
         this._containerRunOptions = containerRunOptions;
     },
 
-    initializeExecution: function(done) {
+    initializeExecution: function (done) {
         var self = this;
-        this._containerFactory.createContainer(this._containerCreateOptions, function(err, container) {
+        this._containerFactory.createContainer(this._containerCreateOptions, function (err, container) {
             self._container = container;
             done();
         });
     },
 
-    beginExecution: function(done) {
+    beginExecution: function (done) {
         this._container.start(this._containerRunOptions, done);
     },
 
-    execute: function(code, executionOptions, done) {
+    execute: function (code, executionOptions, done) {
         var timeLimit = executionOptions.timeLimit;
 
         var self = this;
@@ -44,27 +45,24 @@ BaseExecutor.prototype = {
             },
 
             function onContainerStreamReadyDlg(stream, callback) {
-                stream.setEncoding('utf8');
-
-                var stdin = '';
-                var stderr = '';
+                var stdout;
+                var stderr;
 
                 stream.on('end', function onStreamEndDlg() {
-                    console.log('Execution finished!');
-                    endTime = new Date();
-                    var b = startTime;
-                    done();
+                    var endTime = new Date();
+                    var executionTime = endTime - self.timer;
+                    var result = {
+                        stdout: stdout.value,
+                        stderr: stderr.value,
+                        executionTime: executionTime
+                    }
+
+                    self._cleanup(result, done);
                 });
 
-                self._container.demuxStream(stream, function onStreamProcessDlg(stdinStream, stderrStream) {
-
-
-                });
-
-                // todo demultiplex streams to provide stdout and stderr
-                // todo and call done here
-                stream.on('data', function (data) {
-                    done();
+                self._container.demuxStream(stream, function onStreamProcessDlg(stdoutStream, stderrStream) {
+                    stdout = stdoutStream;
+                    stderr = stderrStream;
                 });
 
                 stream.write(code);
@@ -74,22 +72,32 @@ BaseExecutor.prototype = {
 
             function containerStartDlg(callback) {
                 self.beginExecution(callback);
-                startTime = new Date();
+            },
+
+            function onContainerStarted(data, callback) {
+                self.timer = new Date();
+                callback();
             }
-        ]);
+        ], function onExecuteErrorDlg(err) {
+            if (err) {
+                console.log(err);
+            }
+        });
     },
 
-    _processStream: function(stream, done) {
-        stream.setEncoding('utf8');
-        var result = '';
-
-        stream.on('data', function(data) {
-            result += data;
-        });
-
-        stream.on('end', function() {
-            done(null, result);
-        })
+    _cleanup: function (result, done) {
+        var self = this;
+        async.waterfall([
+            function killContainerDlg(callback) {
+                self._container.kill(callback);
+            },
+            function removeContainerDlg(data, callback) {
+                self._container.remove(function (err) {
+                    callback(err, result);
+                });
+            }
+        ], done)
+        console.log('Execution finished!');
     }
 }
 
