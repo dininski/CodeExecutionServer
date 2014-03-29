@@ -15,7 +15,7 @@ var Config = {
                 "AttachStdin": true,
                 "AttachStdout": true,
                 "AttachStderr": true,
-                "Tty": true,
+                "Tty": false,
                 "OpenStdin": true,
                 "StdinOnce": true,
                 "Cmd": [
