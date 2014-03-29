@@ -3,80 +3,28 @@
 var async = require('async');
 
 var Routing = function () {
-    this._containerFactory;
+    this._codeExecutionService;
+    this._httpServer;
 }
 
 Routing.prototype = {
-    registerRoutes: function (httpServer, containerFactory) {
-        this._containerFactory = containerFactory;
+    init: function(httpServer, codeExecutionService) {
+        this._httpServer = httpServer;
+        this._codeExecutionService = codeExecutionService;
+    },
 
-        httpServer.registerRoute({
+    registerRoutes: function () {
+        this._httpServer.registerRoute({
             method: 'post',
-            path: '/code',
+            path: '/execute',
             handler: this.handleCodeExecuteRequest.bind(this)
         });
     },
 
     handleCodeExecuteRequest: function (req, res, next) {
-        var self = this;
-        var createOptions = {
-            "AttachStdin": true,
-            "AttachStdout": true,
-            "AttachStderr": true,
-            "Tty": true,
-            "OpenStdin": true,
-            "StdinOnce": true,
-            "Cmd": [
-                "/bin/sh",
-                "-c",
-                "python3.3 userCode.py"
-            ],
-            "Image": "codeExecution:python3.3",
-            "Volumes": {
-                "/usercode": "/media/sf_CodeExecutionServer/Sample:/usercode"
-            },
-            "WorkingDir": "/usercode",
-            "Binds": ["/media/sf_CodeExecutionServer/Sample:/usercode"]
-        };
+        var timeLimit = 1000;
+        this._codeExecutionService.execute('1\n2\n', 1, {timeLimit: timeLimit}, function(stdout, stderr) {
 
-        async.waterfall([
-            function createContainerDlg(callback) {
-                self._containerFactory.createContainer(createOptions, callback);
-            },
-
-            function onContainerCreateDlg(container, callback) {
-                container.getStream(function (err, stream) {
-                    callback(err, container, stream)
-                });
-            },
-
-            function onContainerStreamReadyDlg(container, stream, callback) {
-                stream.setEncoding('utf8');
-
-                stream.on('end', function () {
-                    console.log('stream ended');
-                });
-
-                stream.write('1\n2\n');
-
-                stream.on('data', function (data) {
-                    console.log(data);
-                });
-
-                callback(null, container);
-            },
-
-            function containerStartDlg(container, callback) {
-                var startOptions = {
-                    "Binds": ["/media/sf_CodeExecutionServer/Sample:/usercode"]
-                }
-
-                container.start(createOptions, function (err, data) {
-                    callback(err, container, data);
-                });
-            }
-        ], function (err) {
-            console.log('Started execution');
         });
     }
 }

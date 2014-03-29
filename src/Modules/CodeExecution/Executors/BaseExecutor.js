@@ -1,6 +1,8 @@
 'use strict';
 
 var async = require('async');
+var startTime;
+var endTime;
 
 var BaseExecutor = function() {
     this._containerFactory;
@@ -16,44 +18,78 @@ BaseExecutor.prototype = {
         this._containerRunOptions = containerRunOptions;
     },
 
-    _createContainer: function(done) {
-        this._container = this._containerFactory.createContainer(this._containerCreateOptions, done);
+    initializeExecution: function(done) {
+        var self = this;
+        this._containerFactory.createContainer(this._containerCreateOptions, function(err, container) {
+            self._container = container;
+            done();
+        });
     },
 
-    _startContainer: function(done) {
+    beginExecution: function(done) {
         this._container.start(this._containerRunOptions, done);
     },
 
-    run: function(code, stdin, stderr, time, done) {
+    execute: function(code, executionOptions, done) {
+        var timeLimit = executionOptions.timeLimit;
+
         var self = this;
         async.waterfall([
             function createContainerDlg(callback) {
-                self._createContainer(callback);
+                self.initializeExecution(callback);
             },
 
             function onContainerCreateDlg(callback) {
-                self.container.getStream(callback);
+                self._container.getStream(callback);
             },
 
             function onContainerStreamReadyDlg(stream, callback) {
                 stream.setEncoding('utf8');
 
-                stream.on('end', function () {
-                    callback();
+                var stdin = '';
+                var stderr = '';
+
+                stream.on('end', function onStreamEndDlg() {
+                    console.log('Execution finished!');
+                    endTime = new Date();
+                    var b = startTime;
+                    done();
+                });
+
+                self._container.demuxStream(stream, function onStreamProcessDlg(stdinStream, stderrStream) {
+
+
                 });
 
                 // todo demultiplex streams to provide stdout and stderr
+                // todo and call done here
                 stream.on('data', function (data) {
-                    console.log(data);
+                    done();
                 });
 
                 stream.write(code);
+
+                callback();
             },
 
-            function containerStartDlg(container, callback) {
-                self.container._startContainer(callback);
+            function containerStartDlg(callback) {
+                self.beginExecution(callback);
+                startTime = new Date();
             }
-        ], done);
+        ]);
+    },
+
+    _processStream: function(stream, done) {
+        stream.setEncoding('utf8');
+        var result = '';
+
+        stream.on('data', function(data) {
+            result += data;
+        });
+
+        stream.on('end', function() {
+            done(null, result);
+        })
     }
 }
 

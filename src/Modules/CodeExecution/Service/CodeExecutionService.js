@@ -9,9 +9,9 @@ CodeExecutionService.prototype = {
         this._executorFactory = executorFactory;
     },
 
-    execute: function(code, language, stdin, done) {
+    execute: function(code, language, executionOptions, done) {
         var executor = this._executorFactory.getExecutor(language);
-        executor.run(code, stdin, done);
+        executor.execute(code, executionOptions, done);
     }
 }
 
