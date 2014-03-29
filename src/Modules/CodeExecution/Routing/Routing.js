@@ -22,11 +22,11 @@ Routing.prototype = {
     },
 
     handleCodeExecuteRequest: function (req, res, next) {
+        var self = this;
         var timeLimit = 1000;
         var code = '1\n2\n';
         this._codeExecutionService.execute(code, 1, {timeLimit: timeLimit}, function(err, result) {
-            res.setHeader('Content-type', 'application-json');
-            res.send(JSON.stringify(result));
+            self._httpServer.respondJSON(req, res, result);
         });
     }
 }
