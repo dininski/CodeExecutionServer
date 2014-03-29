@@ -3,6 +3,6 @@
     "version": "0.1",
     "main": "main.js",
     "plugin": {
-        "provides": ["ContainerManagement"]
+        "provides": ["ContainerFactory"]
     }
 }
