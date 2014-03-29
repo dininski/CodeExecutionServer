@@ -10,7 +10,7 @@ Container.prototype = {
     },
 
     start: function (opts, done) {
-        this._dockerContainer.start(done);
+        this._dockerContainer.start(opts, done);
     },
 
     kill: function (done) {

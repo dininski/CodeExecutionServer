@@ -18,26 +18,25 @@ Routing.prototype = {
     },
 
     handleCodeExecuteRequest: function (req, res, next) {
-        // TODO - handle code execution request
-
         var self = this;
         var createOptions = {
-            "AttachStdin":true,
-            "AttachStdout":true,
-            "AttachStderr":true,
-            "Tty":true,
-            "OpenStdin":true,
-            "StdinOnce":true,
+            "AttachStdin": true,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": true,
+            "OpenStdin": true,
+            "StdinOnce": true,
             "Cmd": [
                 "/bin/sh",
                 "-c",
-                "python3.3"
+                "python3.3 userCode.py"
             ],
             "Image": "codeExecution:python3.3",
             "Volumes": {
-                "/code": {}
+                "/usercode": "/media/sf_CodeExecutionServer/Sample:/usercode"
             },
-            "WorkingDir": "/usercode"
+            "WorkingDir": "/usercode",
+            "Binds": ["/media/sf_CodeExecutionServer/Sample:/usercode"]
         };
 
         async.waterfall([
@@ -46,7 +45,7 @@ Routing.prototype = {
             },
 
             function onContainerCreateDlg(container, callback) {
-                container.getStream(function(err, stream) {
+                container.getStream(function (err, stream) {
                     callback(err, container, stream)
                 });
             },
@@ -54,22 +53,22 @@ Routing.prototype = {
             function onContainerStreamReadyDlg(container, stream, callback) {
                 stream.setEncoding('utf8');
 
-                stream.on('end', function() {
+                stream.on('end', function () {
                     console.log('stream ended');
                 });
 
-                stream.write('1\n2');
-                
-                stream.on('data', function(data) {
+                stream.write('1\n2\n');
+
+                stream.on('data', function (data) {
                     console.log(data);
-                })
+                });
 
                 callback(null, container);
             },
 
             function containerStartDlg(container, callback) {
                 var startOptions = {
-                    "Binds": ["/media/sf_CodeExecutionServer/Sample/:/usercode/"]
+                    "Binds": ["/media/sf_CodeExecutionServer/Sample:/usercode"]
                 }
 
                 container.start(createOptions, function (err, data) {
@@ -77,7 +76,7 @@ Routing.prototype = {
                 });
             }
         ], function (err) {
-            console.log('Execution finished');
+            console.log('Started execution');
         });
     }
 }
