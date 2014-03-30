@@ -45,29 +45,15 @@ BaseExecutor.prototype = {
             },
 
             function onContainerStreamReadyDlg(stream, callback) {
-                var stdout;
-                var stderr;
+                self.sendArguments(stream, args, callback);
+            },
 
-                stream.on('end', function onStreamEndDlg() {
-                    var endTime = new Date();
-                    var executionTime = endTime - self.timer;
-                    var result = {
-                        stdout: stdout.value,
-                        stderr: stderr.value,
-                        executionTime: executionTime
-                    }
+            function onContainerCreateDlg(callback) {
+                self._container.getReadStream(callback);
+            },
 
-                    BaseExecutor.prototype._cleanup.call(self, result, done);
-                });
-
-                self._container.demuxStream(stream, function onStreamProcessDlg(stdoutStream, stderrStream) {
-                    stdout = stdoutStream;
-                    stderr = stderrStream;
-                });
-
-                stream.write(args);
-
-                callback();
+            function onContainerCreateDlg(stream, callback) {
+                self.getOutput(stream, callback, done);
             },
 
             function containerStartDlg(callback) {
@@ -85,8 +71,42 @@ BaseExecutor.prototype = {
         });
     },
 
+    sendArguments: function(stream, args, done) {
+        stream.write(args, function() {
+            stream.end('','utf8', done);
+        });
+    },
+
+    getOutput: function(stream, callback, done){
+        var stdout;
+        var stderr;
+        var self = this;
+
+        stream.on('end', function onStreamEndDlg() {
+            var endTime = new Date();
+            var executionTime = endTime - self.timer;
+            var result = {
+                stdout: stdout.value,
+                stderr: stderr.value,
+                executionTime: executionTime
+            }
+
+            BaseExecutor.prototype._cleanup.call(self, result, done);
+        });
+
+        this._container.demuxStream(stream, function onStreamProcessDlg(stdoutStream, stderrStream) {
+            stdout = stdoutStream;
+            stderr = stderrStream;
+        });
+
+        callback();
+    },
+
     _cleanup: function (result, done) {
         var self = this;
+
+        console.log('Execution finished!');
+
         async.waterfall([
             function killContainerDlg(callback) {
                 self._container.kill(callback);
@@ -97,8 +117,7 @@ BaseExecutor.prototype = {
                 });
             }
         ], done)
-        console.log('Execution finished!');
     }
 }
 
-module.exports = BaseExecutor;
+module.exports = BaseExecutor;

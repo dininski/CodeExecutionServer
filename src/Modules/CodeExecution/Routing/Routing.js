@@ -25,7 +25,7 @@ Routing.prototype = {
         var language = parseInt(req.body.language, 10);
         var self = this;
         var timeLimit = 1000;
-        var argsString = '1\n2\n';
+        var argsString = '1\n\r2\n\rEOF\n\r';
         this._codeExecutionService.execute(argsString, language, {timeLimit: timeLimit}, function(err, result) {
             self._httpServer.respondJSON(req, res, result);
         });

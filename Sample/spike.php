@@ -25,9 +25,14 @@ function solve($param) {
 
 ?>
 
-<?php $arguments = array();
-    array_push($arguments, 2); 
-    array_push($arguments, 1); 
+<?php 
+    $arguments = array();
 
+    while($line = fgets(STDIN)) {
+        echo $line;
+        array_push($arguments, $line);
+    }
+
+    var_dump($arguments);
     echo solve($arguments);
 ?>

@@ -12,4 +12,3 @@ PythonExecutor.prototype = {
 util.inherits(PythonExecutor, BaseExecutor);
 
 module.exports = PythonExecutor;
-
