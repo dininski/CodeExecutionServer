@@ -4,6 +4,7 @@ var BaseExecutor = require('./BaseExecutor')
 var util = require('util');
 
 var PhpExecutor = function () {
+    this.name = "Php Executor";
 }
 
 PhpExecutor.prototype = {

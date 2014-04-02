@@ -3,18 +3,18 @@
 var Docker = require('dockerode');
 var Container = require('./Container');
 
-var ContainerFactory = function(options) {
+var ContainerFactory = function (options) {
     this._dockerode;
 }
 
 ContainerFactory.prototype = {
-    init: function(opts) {
+    init: function (opts) {
         this._dockerode = new Docker(opts);
     },
 
-    createContainer: function(opts, done) {
-        this._dockerode.createContainer(opts, function(err, dockerContainer) {
-            if(err) {
+    createContainer: function (opts, done) {
+        this._dockerode.createContainer(opts, function onContainerCreateDlg(err, dockerContainer) {
+            if (err) {
                 return done(err);
             }
 
@@ -24,7 +24,7 @@ ContainerFactory.prototype = {
         });
     },
 
-    getContainerById: function(id) {
+    getContainerById: function (id) {
         var container = new Container();
         var dockerContainer = this._dockerode.getContainer(id);
         container.init(dockerContainer);

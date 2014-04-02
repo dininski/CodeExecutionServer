@@ -1,6 +1,7 @@
 'use strict';
 
 var async = require('async');
+var RequestProcessor = require('./Processors/RequestProcessor');
 
 var Routing = function () {
     this._codeExecutionService;
@@ -8,7 +9,7 @@ var Routing = function () {
 }
 
 Routing.prototype = {
-    init: function(httpServer, codeExecutionService) {
+    init: function (httpServer, codeExecutionService) {
         this._httpServer = httpServer;
         this._codeExecutionService = codeExecutionService;
     },
@@ -22,11 +23,16 @@ Routing.prototype = {
     },
 
     handleCodeExecuteRequest: function (req, res, next) {
-        var language = parseInt(req.body.language, 10);
         var self = this;
-        var timeLimit = 1000;
-        var argsString = '1\n\r2\n\rEOF\n\r';
-        this._codeExecutionService.execute(argsString, language, {timeLimit: timeLimit}, function(err, result) {
+        async.waterfall([
+            function processRequestDlg(callback) {
+                RequestProcessor.processCodeRequest(req, res, callback);
+            },
+
+            function executeCode(codeExecutionRequest, tests, callback) {
+                self._codeExecutionService.execute(codeExecutionRequest, tests, callback);
+            }
+        ], function onRequestHandledDlg(err, result) {
             self._httpServer.respondJSON(req, res, result);
         });
     }

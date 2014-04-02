@@ -3,7 +3,8 @@
 var BaseExecutor = require('./BaseExecutor')
 var util = require('util');
 
-var PythonExecutor = function() {
+var PythonExecutor = function () {
+    this.name = "Python Executor";
 }
 
 PythonExecutor.prototype = {

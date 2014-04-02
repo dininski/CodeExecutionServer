@@ -23,12 +23,16 @@ Container.prototype = {
         this._dockerContainer.remove(done);
     },
 
+    restart: function (done) {
+        this._dockerContainer.restart(done);
+    },
+
     getStream: function (done) {
         // TODO extract in constants/config
         this._dockerContainer.attach({stream: true, stdin: true, stdout: true, stderr: true, tty: false}, done);
     },
 
-    demuxStream: function(stream, done) {
+    demuxStream: function (stream, done) {
         var stdout = new StreamMock();
         var stderr = new StreamMock();
         this._dockerContainer.modem.demuxStream(stream, stdout, stderr);
@@ -45,12 +49,12 @@ Container.prototype = {
 }
 
 // TODO - refactor and update
-var StreamMock = function() {
+var StreamMock = function () {
     this.value = '';
 }
 
 StreamMock.prototype = {
-    write: function(data) {
+    write: function (data) {
         this.value += data.toString();
     }
 }

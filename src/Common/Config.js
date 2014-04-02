@@ -2,7 +2,8 @@
 
 var Config = {
     Http: {
-        port: 9000
+        port: 9000,
+        uploadDir: 'd:\\crap\\uploadDir'
     },
     ContainerManagement: {
         initOptions: {

@@ -5,11 +5,12 @@ var startTime;
 var endTime;
 
 var BaseExecutor = function () {
-    this._containerFactory;
-    this._containerCreateOptions;
-    this._containerRunOptions;
-    this._container;
-    this.timer;
+    this._containerFactory = {};
+    this._containerCreateOptions = {};
+    this._containerRunOptions = {};
+    this._container = {};
+    this.timer = 0;
+    this.timeLimit = 0;
 }
 
 BaseExecutor.prototype = {
@@ -31,8 +32,9 @@ BaseExecutor.prototype = {
         this._container.start(this._containerRunOptions, done);
     },
 
-    execute: function (args, executionOptions, done) {
+    execute: function (stdinContent, executionOptions, done) {
         var timeLimit = executionOptions.timeLimit;
+        var memoryLimit = executionOptions.memoryLimit;
 
         var self = this;
         async.waterfall([
@@ -45,7 +47,7 @@ BaseExecutor.prototype = {
             },
 
             function onContainerStreamReadyDlg(stream, callback) {
-                self.sendArguments(stream, args, callback);
+                self.writeStdin(stream, stdinContent, callback);
             },
 
             function onContainerCreateDlg(callback) {
@@ -71,13 +73,13 @@ BaseExecutor.prototype = {
         });
     },
 
-    sendArguments: function(stream, args, done) {
-        stream.write(args, function() {
-            stream.end('','utf8', done);
+    writeStdin: function (stream, args, done) {
+        stream.write(args, function writeStdinDlg() {
+            done();
         });
     },
 
-    getOutput: function(stream, callback, done){
+    getOutput: function (stream, callback, done) {
         var stdout;
         var stderr;
         var self = this;
@@ -120,4 +122,4 @@ BaseExecutor.prototype = {
     }
 }
 
-module.exports = BaseExecutor;
+module.exports = BaseExecutor;

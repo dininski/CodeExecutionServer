@@ -11,7 +11,7 @@ CodeExecutionServer.prototype = {
     start: function () {
         var configPath = path.join(__dirname, "ModulesConfig.js");
         var config = architect.loadConfig(configPath);
-        architect.createApp(config, function (err, app) {
+        architect.createApp(config, function createArchitectAppDlg(err, app) {
             if (err) {
                 console.log(err);
             } else {
