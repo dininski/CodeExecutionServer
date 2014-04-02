@@ -56,7 +56,8 @@ var Config = {
             runOptions: {
                 "Binds": ["/media/sf_CodeExecutionServer/Sample:/usercode"]
             }
-        }
+        },
+        baseFolder: 'd:\\crap\\baseFolder'
     }
 };
 
