@@ -4,6 +4,7 @@ var CodeExecutionRequestOptions = require('./CodeExecutionRequestOptions');
 
 var CodeExecutionRequest = function () {
     this.id = 0;
+    this.executionId = '';
     this.userCode = '';
     this.language = '';
     this.options = {};

@@ -7,7 +7,7 @@ var zlib = require('zlib');
 var async = require('async');
 var fs = require('fs');
 
-var RequestProcessor = function() {
+var RequestProcessor = function () {
 }
 
 RequestProcessor.prototype = {
@@ -20,19 +20,35 @@ RequestProcessor.prototype = {
         zip.extractAllTo(folder);
 
         async.waterfall([
+            function createExecutionDir(callback) {
+                fs.mkdir(folder + '/executionFolder', callback);
+            },
+
             function getUserCodeFileDlg(callback) {
-                var userCodeFile = folder + '/userCode.txt.gz';
+                var userCodeFile = folder + '/userCode.deflate';
                 fs.readFile(userCodeFile, callback);
             },
 
-            function onUserCodeReadingDlg(buffer, callback) {
-                
+// TODO add inflate
+//            function onUserCodeReadDlg(buffer, callback) {
+//                zlib.inflate(buffer, callback);
+//            },
+
+            function onCodeInflatedDlg(code, callback) {
+                var userCode = code.toString('utf8');
+                var userCodeFile = folder + '/executionFolder/userFile';
+                fs.writeFile(userCodeFile, userCode, function (err) {
+                    callback(err);
+                });
             }
         ], function onProcessingCompeletedDlg(err) {
-            console.log(err);
+            if (err) {
+                done(err);
+            } else {
+                // TODO add execution id
+                CodeExecutionRequest.fromRequest(req, res, done);
+            }
         });
-
-        CodeExecutionRequest.fromRequest(req, res, done);
     }
 };
 

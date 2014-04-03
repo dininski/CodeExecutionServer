@@ -22,9 +22,5 @@ function solve() {
         return 4;
     }
 }
-
-?>
-
-<?php 
     echo solve();
 ?>
