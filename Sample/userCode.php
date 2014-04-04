@@ -1,9 +1,9 @@
 <?php
 
-function solve($param) {
+function solve() {
     // Read input data
-    $X = (float) $param[0];
-    $Y = (float) $param[1];
+    $X = (float) fgets(STDIN);
+    $Y = (float) fgets(STDIN);
 
     // Solve the problem
     if ($X == 0 && $Y == 0) {
@@ -22,4 +22,6 @@ function solve($param) {
         return 4;
     }
 }
+
+echo solve();
 ?>
