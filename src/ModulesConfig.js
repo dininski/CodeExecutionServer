@@ -6,5 +6,6 @@ module.exports = [
     { packagePath: "./Modules/Routing/" },
     { packagePath: "./Modules/CodeExecution/Service/" },
     { packagePath: "./Modules/CodeExecution/Executors/", languages: Constants.Languages, executorOptions: Config.ExecutionConfig },
+    { packagePath: "./Modules/CodeExecution/MetricsProvider"},
     { packagePath: "./Modules/Containers/", initOptions: Config.ContainerManagement.initOptions }
 ]

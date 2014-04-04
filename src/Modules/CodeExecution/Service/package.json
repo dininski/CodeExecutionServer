@@ -3,7 +3,7 @@
     "version": "0.1",
     "main": "main.js",
     "plugin": {
-        "consumes": ["ContainerFactory", "ExecutorFactory"],
+        "consumes": ["ContainerFactory", "ExecutorFactory", "MetricsProvider"],
         "provides": ["CodeExecutionService"]
     }
 }

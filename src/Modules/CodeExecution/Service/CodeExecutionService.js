@@ -8,8 +8,9 @@ var CodeExecutionService = function () {
 }
 
 CodeExecutionService.prototype = {
-    init: function (executorFactory) {
+    init: function (executorFactory, metricsProvider) {
         this._executorFactory = executorFactory;
+        this._metricsProvider = metricsProvider;
     },
 
     execute: function (codeExecutionRequest, checkProvider, done) {
@@ -29,9 +30,14 @@ CodeExecutionService.prototype = {
                         if (err) {
                             done(err);
                         } else {
+                            var executionMetrics = self._metricsProvider.getMetricsForContainer(executor._id);
+                            var runningTime = executionMetrics['die'] -executionMetrics['start'] ;
+                            result.runningTime = runningTime;
+
                             var responseResult = {
                                 result: result
                             }
+
                             codeExecutionResult.checkResults.push(responseResult);
                             self._execute(codeExecutionRequest, checkProvider, codeExecutionResult, done);
                         }

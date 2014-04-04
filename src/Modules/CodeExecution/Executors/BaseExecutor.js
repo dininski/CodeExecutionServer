@@ -7,6 +7,7 @@ var BaseExecutor = function () {
     this._containerCreateOptions = {};
     this._containerRunOptions = {};
     this._container = {};
+    this._id = '';
     this.timeLimit = 0;
 }
 
@@ -21,6 +22,7 @@ BaseExecutor.prototype = {
         var self = this;
         this._containerFactory.createContainer(this._containerCreateOptions, function (err, container) {
             self._container = container;
+            self._id = container._dockerContainer.id;
             done();
         });
     },
@@ -83,8 +85,7 @@ BaseExecutor.prototype = {
         stream.on('end', function onStreamEndDlg() {
             var result = {
                 stdout: stdout.value,
-                stderr: stderr.value,
-                executionTime: 1
+                stderr: stderr.value
             }
 
             BaseExecutor.prototype._cleanup.call(self, result, done);

@@ -3,10 +3,10 @@
 var async = require('async');
 
 var Routing = function () {
-    this._codeExecutionService;
-    this._httpServer;
-    this.requestProcessor;
-    this.responseProcessor;
+    this._codeExecutionService = {};
+    this._httpServer = {};
+    this.requestProcessor = {};
+    this.responseProcessor = {};
 }
 
 Routing.prototype = {
