@@ -1,15 +1,12 @@
 'use strict';
 
 var async = require('async');
-var startTime;
-var endTime;
 
 var BaseExecutor = function () {
     this._containerFactory = {};
     this._containerCreateOptions = {};
     this._containerRunOptions = {};
     this._container = {};
-    this.timer = 0;
     this.timeLimit = 0;
 }
 
@@ -33,8 +30,11 @@ BaseExecutor.prototype = {
     },
 
     execute: function (stdinContent, executionOptions, done) {
+        this._containerCreateOptions.Memory = executionOptions.memoryLimit;
         var timeLimit = executionOptions.timeLimit;
-        var memoryLimit = executionOptions.memoryLimit;
+        var binds = [];
+        binds.push(executionOptions.executionFolder + ":/executionFolder");
+        this._containerRunOptions.Binds = binds;
 
         var self = this;
         async.waterfall([
@@ -55,17 +55,13 @@ BaseExecutor.prototype = {
             },
 
             function onContainerCreateDlg(stream, callback) {
-                self.getOutput(stream, callback, done);
+                self.attachToOutput(stream, callback, done);
             },
 
             function containerStartDlg(callback) {
                 BaseExecutor.prototype.beginExecution.call(self, callback);
-            },
-
-            function onContainerStarted(data, callback) {
-                self.timer = new Date();
-                callback();
             }
+
         ], function onExecuteErrorDlg(err) {
             if (err) {
                 console.log(err);
@@ -79,18 +75,16 @@ BaseExecutor.prototype = {
         });
     },
 
-    getOutput: function (stream, callback, done) {
+    attachToOutput: function (stream, callback, done) {
         var stdout;
         var stderr;
         var self = this;
 
         stream.on('end', function onStreamEndDlg() {
-            var endTime = new Date();
-            var executionTime = endTime - self.timer;
             var result = {
                 stdout: stdout.value,
                 stderr: stderr.value,
-                executionTime: executionTime
+                executionTime: 1
             }
 
             BaseExecutor.prototype._cleanup.call(self, result, done);
@@ -114,11 +108,11 @@ BaseExecutor.prototype = {
                 self._container.kill(callback);
             },
             function removeContainerDlg(data, callback) {
-                self._container.remove(function (err) {
-                    callback(err, result);
-                });
+                self._container.remove(callback);
             }
-        ], done)
+        ], function(err) {
+            done(err, result);
+        });
     }
 }
 

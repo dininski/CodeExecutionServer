@@ -32,8 +32,12 @@ Routing.prototype = {
                 self.requestProcessor.processCodeRequest(req, res, callback);
             },
 
-            function executeCode(codeExecutionRequest, tests, callback) {
-                self._codeExecutionService.execute(codeExecutionRequest, tests, callback);
+            function executeCodeDlg(codeExecutionRequest, checkProvider, callback) {
+                self._codeExecutionService.execute(codeExecutionRequest, checkProvider, callback);
+            },
+
+            function onAllChecksRunDlg(result, callback) {
+                callback(null, result);
             }
         ], function onRequestHandledDlg(err, result) {
             self._httpServer.respondJSON(req, res, result);

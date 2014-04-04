@@ -3,7 +3,8 @@
 var Config = {
     Http: {
         port: 9000,
-        uploadDir: '/media/sf_docker_events/tmp'
+        uploadDir: '/media/sf_docker_events/tmp',
+        //uploadDir: 'd:\\crap\\uploadDir'
     },
     ContainerManagement: {
         initOptions: {
@@ -22,17 +23,15 @@ var Config = {
                 "Cmd": [
                     "/bin/sh",
                     "-c",
-                    "python3.3 userCode.py"
+                    "python3.3 userFile"
                 ],
                 "Image": "codeExecution:python3.3",
                 "Volumes": {
-                    "/usercode": {}
+                    "/executionFolder": {}
                 },
-                "WorkingDir": "/usercode"
+                "WorkingDir": "/executionFolder"
             },
-            runOptions: {
-                "Binds": ["/media/sf_CodeExecutionServer/Sample:/usercode"]
-            }
+            runOptions: {}
         },
         Php: {
             createOptions: {
@@ -45,19 +44,20 @@ var Config = {
                 "Cmd": [
                     "/bin/sh",
                     "-c",
-                    "php spike.php"
+                    "php userFile"
                 ],
                 "Image": "codeExecution:php5",
                 "Volumes": {
-                    "/usercode": {}
+                    "/executionFolder": {}
                 },
-                "WorkingDir": "/usercode"
+                "WorkingDir": "/executionFolder"
             },
             runOptions: {
-                "Binds": ["/media/sf_CodeExecutionServer/Sample:/usercode"]
+                "Binds": ["/media/sf_CodeExecutionServer/Sample:/executionFolder"]
             }
         },
-        baseFolder: '/media/sf_docker_events/userCode'
+        baseFolder: '/media/sf_docker_events/userCode',
+        //baseFolder: 'd:\\crap\\baseFolder'
     }
 };
 
