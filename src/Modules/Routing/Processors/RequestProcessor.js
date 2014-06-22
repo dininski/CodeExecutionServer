@@ -100,6 +100,25 @@ CodeCheckProvider.prototype = {
         });
     },
 
+    getChecksAsString: function(done) {
+        var checks = [];
+        var self = this;
+        async.each(this.files, function(file, callback) {
+            var fileLocation = self.checksLocation + '/' + file;
+            fs.readFile(fileLocation, function(err, data) {
+                if(err) {
+                    callback(err);
+                } else {
+                    var checkString = data.toString('utf8');
+                    checks.push(checkString);
+                    callback();
+                }
+            });
+        }, function(err) {
+            done(err, checks);
+        });
+    },
+
     getCheck: function (done) {
         var checkFile = this.checksLocation + '/' + this.files[this.cursor++];
         fs.readFile(checkFile, function (err, data) {

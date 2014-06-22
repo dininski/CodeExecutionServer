@@ -6,6 +6,7 @@
         "express": "3.5.1",
         "architect": "0.1.11",
         "async": "0.2.10",
-        "adm-zip": "0.4.4"
+        "adm-zip": "0.4.4",
+        "readable-stream": "1.0.27"
     }
 }

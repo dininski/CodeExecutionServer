@@ -3,8 +3,8 @@
 var Config = {
     Http: {
         port: 9000,
-        uploadDir: '/media/sf_docker_events/tmp',
-        //uploadDir: 'd:\\crap\\uploadDir'
+//        uploadDir: '/media/sf_docker_events/tmp'
+        uploadDir: '/home/vasil/tmp'
     },
     ContainerManagement: {
         initOptions: {
@@ -52,11 +52,9 @@ var Config = {
                 },
                 "WorkingDir": "/executionFolder"
             },
-            runOptions: {
-                "Binds": ["/media/sf_CodeExecutionServer/Sample:/executionFolder"]
-            }
+            runOptions: {}
         },
-        baseFolder: '/media/sf_docker_events/userCode',
+        baseFolder: '/home/vasil/tmp'
         //baseFolder: 'd:\\crap\\baseFolder'
     }
 };
