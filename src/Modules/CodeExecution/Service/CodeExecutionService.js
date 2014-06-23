@@ -4,8 +4,8 @@ var CodeExecutionResult = require('../../../Models/CodeExecutionResult');
 var async = require('async');
 
 var CodeExecutionService = function () {
-    this._executorFactory;
-}
+    this._executorFactory = null;
+};
 
 CodeExecutionService.prototype = {
     init: function (executorFactory, metricsProvider) {
@@ -28,7 +28,7 @@ CodeExecutionService.prototype = {
                         callback(err);
                     } else {
                         var executionMetrics = self._metricsProvider.getMetricsForContainer(executor._id);
-                        var runningTime = executionMetrics['die'] - executionMetrics['start'];
+                        var runningTime = executionMetrics.die - executionMetrics.start;
                         result.runningTime = runningTime;
 
                         var responseResult = {
@@ -58,7 +58,7 @@ CodeExecutionService.prototype = {
                             done(err);
                         } else {
                             var executionMetrics = self._metricsProvider.getMetricsForContainer(executor._id);
-                            var runningTime = executionMetrics['die'] - executionMetrics['start'];
+                            var runningTime = executionMetrics.die - executionMetrics.start;
                             result.runningTime = runningTime;
 
                             var responseResult = {
@@ -70,11 +70,11 @@ CodeExecutionService.prototype = {
                         }
                     });
                 }
-            })
+            });
         } else {
             done(null, codeExecutionResult);
         }
     }
-}
+};
 
 module.exports = CodeExecutionService;
