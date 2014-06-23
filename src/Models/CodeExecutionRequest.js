@@ -1,7 +1,5 @@
 "use strict";
 
-var CodeExecutionRequestOptions = require('./CodeExecutionRequestOptions');
-
 var CodeExecutionRequest = function () {
     this.id = 0;
     this.executionId = '';
@@ -18,6 +16,6 @@ CodeExecutionRequest.prototype = {
         this.language = language;
         this.options = options;
     }
-}
+};
 
 module.exports = CodeExecutionRequest;

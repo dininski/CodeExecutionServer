@@ -90,7 +90,7 @@ BaseExecutor.prototype = {
             var result = {
                 stdout: stdout.value,
                 stderr: stderr.value
-            }
+            };
 
             BaseExecutor.prototype._cleanup.call(self, result, done);
         });
@@ -119,6 +119,6 @@ BaseExecutor.prototype = {
             done(err, result);
         });
     }
-}
+};
 
 module.exports = BaseExecutor;

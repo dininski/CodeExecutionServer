@@ -1,5 +1,5 @@
 'use strict';
-var Config = require('../../../Common/Config')
+var Config = require('../../../Common/Config');
 
 var Docker = require('dockerode');
 
@@ -7,7 +7,7 @@ var MetricsProvider = function () {
     this._docker = {};
     this.containerMetrics = {};
     this.init();
-}
+};
 
 MetricsProvider.prototype = {
     init: function () {
@@ -38,6 +38,6 @@ MetricsProvider.prototype = {
             return false;
         }
     }
-}
+};
 
 module.exports = MetricsProvider;

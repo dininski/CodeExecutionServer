@@ -5,10 +5,10 @@ var util = require('util');
 
 var PhpExecutor = function () {
     this.name = "Php Executor";
-}
+};
 
 PhpExecutor.prototype = {
-}
+};
 
 util.inherits(PhpExecutor, BaseExecutor);
 
