@@ -8,7 +8,7 @@ function CodeCheckProvider() {
     this.files = [];
     this.filesCount = 0;
     this.cursor = 0;
-};
+}
 
 CodeCheckProvider.prototype = {
     init: function (checksLocation, done) {

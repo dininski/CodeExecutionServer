@@ -21,7 +21,7 @@ MetricsProvider.prototype = {
             stream.on('data', function (data) {
                 var dataObj = JSON.parse(data.toString('utf8'));
                 if (!self.containerMetrics[dataObj.id]) {
-                    self.containerMetrics[dataObj.id] = {}
+                    self.containerMetrics[dataObj.id] = {};
                 }
 
                 self.containerMetrics[dataObj.id][dataObj.status] = dataObj.time;

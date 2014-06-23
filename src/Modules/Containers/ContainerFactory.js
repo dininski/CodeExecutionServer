@@ -5,7 +5,7 @@ var Container = require('./Container');
 
 var ContainerFactory = function (options) {
     this._dockerode;
-}
+};
 
 ContainerFactory.prototype = {
     init: function (opts) {
@@ -30,6 +30,6 @@ ContainerFactory.prototype = {
         container.init(dockerContainer);
         return container;
     }
-}
+};
 
 module.exports = ContainerFactory;
