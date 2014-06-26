@@ -1,7 +1,9 @@
+'use strict';
+
 var CodeExecutionCheck = function() {
     this.stdin = '';
     this.id = '';
-}
+};
 
 CodeExecutionCheck.prototype = {
     init: function(stdin, id, fsLocation) {

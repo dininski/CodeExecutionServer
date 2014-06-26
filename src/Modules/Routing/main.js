@@ -16,4 +16,4 @@ module.exports = function setup(options, imports, register) {
     routing.registerRoutes();
 
     register(null, {});
-}
+};

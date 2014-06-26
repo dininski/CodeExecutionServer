@@ -7,7 +7,7 @@ var Routing = function () {
     this._httpServer = {};
     this.requestProcessor = {};
     this.responseProcessor = {};
-}
+};
 
 Routing.prototype = {
     init: function (httpServer, codeExecutionService, requestProcessor, responseProcessor) {
@@ -43,6 +43,6 @@ Routing.prototype = {
             self._httpServer.respondJSON(req, res, result);
         });
     }
-}
+};
 
 module.exports = Routing;

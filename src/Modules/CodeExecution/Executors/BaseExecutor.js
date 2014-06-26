@@ -9,7 +9,7 @@ var BaseExecutor = function () {
     this._container = {};
     this._id = '';
     this.timeLimit = 0;
-}
+};
 
 BaseExecutor.prototype = {
     init: function (containerFactory, containerCreateOptions, containerRunOptions) {
@@ -21,9 +21,13 @@ BaseExecutor.prototype = {
     initializeExecution: function (done) {
         var self = this;
         this._containerFactory.createContainer(this._containerCreateOptions, function (err, container) {
-            self._container = container;
-            self._id = container._dockerContainer.id;
-            done();
+            if (err) {
+                done(err);
+            } else {
+                self._container = container;
+                self._id = container._dockerContainer.id;
+                done();
+            }
         });
     },
 
@@ -86,7 +90,7 @@ BaseExecutor.prototype = {
             var result = {
                 stdout: stdout.value,
                 stderr: stderr.value
-            }
+            };
 
             BaseExecutor.prototype._cleanup.call(self, result, done);
         });
@@ -111,10 +115,10 @@ BaseExecutor.prototype = {
             function removeContainerDlg(data, callback) {
                 self._container.remove(callback);
             }
-        ], function(err) {
+        ], function (err) {
             done(err, result);
         });
     }
-}
+};
 
 module.exports = BaseExecutor;

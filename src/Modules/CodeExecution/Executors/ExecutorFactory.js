@@ -4,9 +4,9 @@ var PythonExecutor = require('./PythonExecutor');
 var PhpExecutor = require('./PhpExecutor');
 
 var ExecutorFactory = function () {
-    this._languages;
-    this._executorOptions;
-}
+    this._languages = null;
+    this._executorOptions = null;
+};
 
 ExecutorFactory.prototype = {
     init: function (languages, executorOptions, containerFactory) {
@@ -32,6 +32,6 @@ ExecutorFactory.prototype = {
                 return phpExecutor;
         }
     }
-}
+};
 
 module.exports = ExecutorFactory;

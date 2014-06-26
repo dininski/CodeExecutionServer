@@ -1,10 +1,11 @@
 'use strict';
 
-var ReadableStream = require('readable-stream');
+// var ReadableStream = require('readable-stream');
+var StreamMock = require('./StreamMock');
 
 var Container = function (options) {
-    this._dockerContainer;
-}
+    this._dockerContainer = null;
+};
 
 Container.prototype = {
     init: function (container) {
@@ -46,17 +47,6 @@ Container.prototype = {
     getReadStream: function (done) {
         this._dockerContainer.attach({stream: true, stdout: true, stderr: true, tty: false}, done);
     }
-}
-
-// TODO - refactor and update
-var StreamMock = function () {
-    this.value = '';
-}
-
-StreamMock.prototype = {
-    write: function (data) {
-        this.value += data.toString();
-    }
-}
+};
 
 module.exports = Container;

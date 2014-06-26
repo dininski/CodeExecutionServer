@@ -19,6 +19,6 @@ CodeExecutionServer.prototype = {
             }
         });
     }
-}
+};
 
 module.exports = CodeExecutionServer;

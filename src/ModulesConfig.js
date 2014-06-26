@@ -8,4 +8,4 @@ module.exports = [
     { packagePath: "./Modules/CodeExecution/Executors/", languages: Constants.Languages, executorOptions: Config.ExecutionConfig },
     { packagePath: "./Modules/CodeExecution/MetricsProvider"},
     { packagePath: "./Modules/Containers/", initOptions: Config.ContainerManagement.initOptions }
-]
+];
