@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/dininski/codeexecutionserver.png?label=ready&title=Ready)](https://waffle.io/dininski/codeexecutionserver)
 CodeExecutionServer
 ===================
 [![Build Status](https://travis-ci.org/dininski/CodeExecutionServer.svg?branch=master)](https://travis-ci.org/dininski/CodeExecutionServer)
