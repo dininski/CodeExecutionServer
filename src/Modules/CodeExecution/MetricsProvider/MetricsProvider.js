@@ -10,12 +10,14 @@ var MetricsProvider = function () {
 };
 
 MetricsProvider.prototype = {
-    init: function () {
+    init: function (logger) {
         var self = this;
+
+        this._logger = logger;
         this._docker = new Docker({socketPath: Config.ContainerManagement.initOptions.socketPath});
         this._docker.getEvents(function (err, stream) {
             if (err) {
-                console.log(err);
+                this._logger.error(err);
             }
 
             stream.on('data', function (data) {

@@ -1,6 +1,5 @@
 'use strict';
 
-// var ReadableStream = require('readable-stream');
 var StreamMock = require('./StreamMock');
 
 var Container = function (options) {

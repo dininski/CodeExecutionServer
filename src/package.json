@@ -7,6 +7,6 @@
         "architect": "0.1.11",
         "async": "0.2.10",
         "adm-zip": "0.4.4",
-        "readable-stream": "1.0.27"
+        "log4js": "0.6.14"
     }
 }

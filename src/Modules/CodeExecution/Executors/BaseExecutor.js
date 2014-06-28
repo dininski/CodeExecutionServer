@@ -12,10 +12,11 @@ var BaseExecutor = function () {
 };
 
 BaseExecutor.prototype = {
-    init: function (containerFactory, containerCreateOptions, containerRunOptions) {
+    init: function (containerFactory, containerCreateOptions, containerRunOptions, logger) {
         this._containerFactory = containerFactory;
         this._containerCreateOptions = containerCreateOptions;
         this._containerRunOptions = containerRunOptions;
+        this._logger = logger;
     },
 
     initializeExecution: function (done) {
@@ -36,13 +37,14 @@ BaseExecutor.prototype = {
     },
 
     execute: function (stdinContent, executionOptions, done) {
+        var self = this;
+
         this._containerCreateOptions.Memory = executionOptions.memoryLimit;
         var timeLimit = executionOptions.timeLimit;
         var binds = [];
         binds.push(executionOptions.executionFolder + ":/executionFolder");
         this._containerRunOptions.Binds = binds;
 
-        var self = this;
         async.waterfall([
             function createContainerDlg(callback) {
                 BaseExecutor.prototype.initializeExecution.call(self, callback);
@@ -70,9 +72,13 @@ BaseExecutor.prototype = {
 
         ], function onExecuteErrorDlg(err) {
             if (err) {
-                console.log(err);
+                self._logger.error(err);
             }
         });
+    },
+
+    recycle: function (done) {
+        this._container.restart(done);
     },
 
     writeStdin: function (stream, args, done) {
@@ -106,7 +112,7 @@ BaseExecutor.prototype = {
     _cleanup: function (result, done) {
         var self = this;
 
-        console.log('Execution finished!');
+        self._logger.info('Execution finished!');
 
         async.waterfall([
             function killContainerDlg(callback) {

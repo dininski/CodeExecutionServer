@@ -18,6 +18,10 @@ CodeExecutionService.prototype = {
         this._executeParallel(codeExecutionRequest, checkProvider, codeExecutionResult, done);
     },
 
+    _executeSingleWorker: function(codeExecutionRequest, checkProvider, codeExecutionResult, done) {
+
+    },
+
     _executeParallel: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
         var self = this;
         checkProvider.getChecksAsString(function (err, checks) {
