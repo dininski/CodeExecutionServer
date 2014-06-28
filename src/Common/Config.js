@@ -21,7 +21,7 @@ var Config = {
                 "OpenStdin": true,
                 "StdinOnce": true,
                 "Cmd": [
-                    "/usr/binpython3.3",
+                    "/usr/bin/python3.3",
                     "userFile"
                 ],
                 "Image": "codeExecution:python3.3",
