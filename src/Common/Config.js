@@ -21,9 +21,8 @@ var Config = {
                 "OpenStdin": true,
                 "StdinOnce": true,
                 "Cmd": [
-                    "/bin/sh",
-                    "-c",
-                    "python3.3 userFile"
+                    "/usr/binpython3.3",
+                    "userFile"
                 ],
                 "Image": "codeExecution:python3.3",
                 "Volumes": {

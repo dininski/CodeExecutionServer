@@ -1,7 +1,6 @@
 'use strict';
 
 var async = require('async');
-var docker = require('dockerode');
 var SimpleStream = require('./SimpleStream');
 
 var BaseSingleWorkerExecutor = function () {
@@ -60,21 +59,22 @@ BaseSingleWorkerExecutor.prototype = {
         this._logger.info('Started new execution');
         this.getStream(function (err, stream) {
             self.processStream(stream, stdinContent, function () {
-                self.beginExecution(function (err, container) {
-                    self._logger.info('Container started!');
-                    self.executionFinished(function onExecuteErrorDlg(err) {
-                        if (err) {
-                            self._logger.error(err);
-                            return done(err);
-                        }
 
-                        var result = {
-                            stdOut: self.stdOut.value,
-                            stdErr: self.stdErr.value
-                        };
+            });
+            self.beginExecution(function (err, container) {
+                self._logger.info('Container started!');
+                self.executionFinished(function onExecuteErrorDlg(err) {
+                    if (err) {
+                        self._logger.error(err);
+                        return done(err);
+                    }
 
-                        return done(null, result);
-                    });
+                    var result = {
+                        stdOut: self.stdOut.value,
+                        stdErr: self.stdErr.value
+                    };
+
+                    return done(null, result);
                 });
             });
         });
