@@ -105,12 +105,6 @@ BaseSingleWorkerExecutor.prototype = {
         });
     },
 
-    // Optimized
-    attachOutput: function (stream) {
-        this._logger.info('Attached read stream');
-        this._container.demuxStream(stream, this.stdOut, this.stdErr);
-    },
-
     cleanup: function (done) {
         this._container.remove(done);
     },

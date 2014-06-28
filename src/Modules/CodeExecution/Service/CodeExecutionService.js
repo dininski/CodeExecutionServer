@@ -62,6 +62,7 @@ CodeExecutionService.prototype = {
 
     _executeParallel: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
         var self = this;
+        var totalTimeInExec = 0;
         checkProvider.getChecksAsString(function (err, checks) {
             async.each(checks, function (check, callback) {
                 var executor = self._executorFactory.getExecutor(codeExecutionRequest.language);
@@ -77,11 +78,14 @@ CodeExecutionService.prototype = {
                             result: result
                         };
 
+                        totalTimeInExec += result.runningTime;
+
                         codeExecutionResult.checkResults.push(responseResult);
                         callback();
                     }
                 });
             }, function (errEach) {
+                self._logger.info('Total exec time: ' + totalTimeInExec);
                 return done(errEach, codeExecutionResult);
             });
         });
