@@ -1,6 +1,6 @@
 'use strict';
 
-var BaseExecutor = require('./BaseExecutor');
+var BaseExecutor = require('./BaseSingleWorkerExecutor');
 var util = require('util');
 
 var PhpExecutor = function () {

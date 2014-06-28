@@ -51,7 +51,7 @@ BaseExecutor.prototype = {
             },
 
             function onContainerCreateDlg(callback) {
-                self._container.getStream(callback);
+                self._container.getWriteStream(callback);
             },
 
             function onContainerStreamReadyDlg(stream, callback) {
@@ -68,6 +68,7 @@ BaseExecutor.prototype = {
 
             function containerStartDlg(callback) {
                 BaseExecutor.prototype.beginExecution.call(self, callback);
+                self._logger.info('Execution started!');
             }
 
         ], function onExecuteErrorDlg(err) {
@@ -92,7 +93,8 @@ BaseExecutor.prototype = {
         var stderr;
         var self = this;
 
-        stream.on('end', function onStreamEndDlg() {
+
+        this._container.wait(function onStreamEndDlg() {
             var result = {
                 stdout: stdout.value,
                 stderr: stderr.value

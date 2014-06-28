@@ -42,9 +42,8 @@ var Config = {
                 "OpenStdin": true,
                 "StdinOnce": true,
                 "Cmd": [
-                    "/bin/sh",
-                    "-c",
-                    "php userFile"
+                    "/usr/bin/php",
+                    "userFile"
                 ],
                 "Image": "codeExecution:php5",
                 "Volumes": {

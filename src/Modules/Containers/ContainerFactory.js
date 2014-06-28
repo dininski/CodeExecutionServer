@@ -3,8 +3,9 @@
 var Docker = require('dockerode');
 var Container = require('./Container');
 
-var ContainerFactory = function (options) {
-    this._dockerode;
+var ContainerFactory = function (logger) {
+    this._logger = logger;
+    this._dockerode = null;
 };
 
 ContainerFactory.prototype = {
@@ -13,12 +14,13 @@ ContainerFactory.prototype = {
     },
 
     createContainer: function (opts, done) {
+        var self = this;
         this._dockerode.createContainer(opts, function onContainerCreateDlg(err, dockerContainer) {
             if (err) {
                 return done(err);
             }
 
-            var container = new Container();
+            var container = new Container(self._logger);
             container.init(dockerContainer);
             done(null, container);
         });

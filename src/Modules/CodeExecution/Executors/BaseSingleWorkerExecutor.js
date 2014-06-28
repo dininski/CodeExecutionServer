@@ -1,0 +1,123 @@
+'use strict';
+
+var async = require('async');
+var docker = require('dockerode');
+var SimpleStream = require('./SimpleStream');
+
+var BaseSingleWorkerExecutor = function () {
+    this._containerFactory = {};
+    this._containerCreateOptions = {};
+    this._containerRunOptions = {};
+    this._container = {};
+    this._id = '';
+    this.timeLimit = 0;
+};
+
+BaseSingleWorkerExecutor.prototype = {
+    init: function (containerFactory, containerCreateOptions, containerRunOptions, logger) {
+        this._containerFactory = containerFactory;
+        this._containerCreateOptions = containerCreateOptions;
+        this._containerRunOptions = containerRunOptions;
+        this._logger = logger;
+        this._firstRun = true;
+        this._executionStart = null;
+        this.stdOut = null;
+        this.stdErr = null;
+    },
+
+    initializeExecution: function (executionOptions, done) {
+        var binds = [];
+        binds.push(executionOptions.executionFolder + ":/executionFolder");
+        var self = this;
+        this._containerCreateOptions.Memory = executionOptions.memoryLimit;
+        this._timeLimit = executionOptions.timeLimit;
+
+        this._containerRunOptions.Binds = binds;
+        this._containerFactory.createContainer(this._containerCreateOptions, function (err, container) {
+            if (err) {
+                done(err);
+            } else {
+                self._container = container;
+                self._id = container._dockerContainer.id;
+                done();
+            }
+        });
+    },
+
+    beginExecution: function (done) {
+        if (this._firstRun) {
+            this._firstRun = false;
+            this._container.start(this._containerRunOptions, done);
+        } else {
+            this._container.restart(done);
+        }
+    },
+
+    execute: function (stdinContent, cleanup, done) {
+        var self = this;
+        this.stdOut = new SimpleStream();
+        this.stdErr = new SimpleStream();
+        this._logger.info('Started new execution');
+        this.getStream(function (err, stream) {
+            self.processStream(stream, stdinContent, function () {
+                self.beginExecution(function (err, container) {
+                    self._logger.info('Container started!');
+                    self.executionFinished(function onExecuteErrorDlg(err) {
+                        if (err) {
+                            self._logger.error(err);
+                            return done(err);
+                        }
+
+                        var result = {
+                            stdOut: self.stdOut.value,
+                            stdErr: self.stdErr.value
+                        };
+
+                        return done(null, result);
+                    });
+                });
+            });
+        });
+    },
+
+    getStream: function (done) {
+        this._container.getStream(done);
+    },
+
+    processStream: function (stream, args, done) {
+        var self = this;
+        this._container.demuxStream(stream, this.stdOut, this.stdErr);
+        stream.write(args, function writeStdinDlg() {
+            self._logger.info('Wrote stdin');
+            done();
+        });
+    },
+
+    executionFinished: function (callback) {
+        var self = this;
+
+        this._container.wait(function (err, data) {
+            self._container.inspect(function (err, data) {
+                self._executionStart = new Date(data.State.StartedAt);
+                self._executionEnd = new Date(data.State.FinishedAt);
+                callback();
+            });
+        });
+    },
+
+    // Optimized
+    attachOutput: function (stream) {
+        this._logger.info('Attached read stream');
+        this._container.demuxStream(stream, this.stdOut, this.stdErr);
+    },
+
+    cleanup: function (done) {
+        this._container.remove(done);
+    },
+
+    getExecutionTime: function () {
+        return this._executionEnd - this._executionStart;
+    }
+};
+
+module.exports = BaseSingleWorkerExecutor;

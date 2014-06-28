@@ -8,18 +8,56 @@ var CodeExecutionService = function () {
 };
 
 CodeExecutionService.prototype = {
-    init: function (executorFactory, metricsProvider) {
+    init: function (executorFactory, metricsProvider, logger) {
+        this._logger = logger;
         this._executorFactory = executorFactory;
         this._metricsProvider = metricsProvider;
     },
 
     execute: function (codeExecutionRequest, checkProvider, done) {
         var codeExecutionResult = new CodeExecutionResult();
-        this._executeParallel(codeExecutionRequest, checkProvider, codeExecutionResult, done);
+        this._executeSingleWorker(codeExecutionRequest, checkProvider, codeExecutionResult, done);
     },
 
-    _executeSingleWorker: function(codeExecutionRequest, checkProvider, codeExecutionResult, done) {
+    _executeSingleWorker: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
+        var self = this;
+        var executor = self._executorFactory.getExecutor(codeExecutionRequest.language);
+        var executionStartTime;
+        executor.initializeExecution(codeExecutionRequest.options, function (err) {
+            self._logger.info('Initialized execution');
+            executionStartTime = new Date();
+            if (err) {
+                self._logger.error(err);
+            }
 
+            checkProvider.getChecksAsString(function (err, checks) {
+                if (err) {
+                    self._logger.error(err);
+                }
+                self._logger.info('Got checks as strings');
+
+                async.eachSeries(checks, function (check, callback) {
+                    executor.execute(check, false, function (err, result) {
+                        self._logger.info('Finished execution');
+                        if (err) {
+                            callback(err);
+                        } else {
+                            result.runningTime = executor.getExecutionTime();
+
+                            var responseResult = {
+                                result: result
+                            };
+
+                            codeExecutionResult.checkResults.push(responseResult);
+                            callback();
+                        }
+                    });
+                }, function (errEach) {
+                    self._logger.info('Total execution time: ' + (new Date() - executionStartTime));
+                    return done(errEach, codeExecutionResult);
+                });
+            });
+        });
     },
 
     _executeParallel: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
