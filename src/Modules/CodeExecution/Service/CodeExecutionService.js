@@ -23,6 +23,7 @@ CodeExecutionService.prototype = {
         var self = this;
         var executor = self._executorFactory.getExecutor(codeExecutionRequest.language);
         var executionStartTime;
+        var totalTimeInExec = 0;
         executor.initializeExecution(codeExecutionRequest.options, function (err) {
             self._logger.info('Initialized execution');
             executionStartTime = new Date();
@@ -47,6 +48,7 @@ CodeExecutionService.prototype = {
                             var responseResult = {
                                 result: result
                             };
+                            totalTimeInExec += result.runningTime;
 
                             codeExecutionResult.checkResults.push(responseResult);
                             callback();
@@ -54,6 +56,8 @@ CodeExecutionService.prototype = {
                     });
                 }, function (errEach) {
                     self._logger.info('Total execution time: ' + (new Date() - executionStartTime));
+                    self._logger.info('Total exec time: ' + totalTimeInExec);
+
                     return done(errEach, codeExecutionResult);
                 });
             });
@@ -62,7 +66,6 @@ CodeExecutionService.prototype = {
 
     _executeParallel: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
         var self = this;
-        var totalTimeInExec = 0;
         checkProvider.getChecksAsString(function (err, checks) {
             async.each(checks, function (check, callback) {
                 var executor = self._executorFactory.getExecutor(codeExecutionRequest.language);
@@ -78,14 +81,12 @@ CodeExecutionService.prototype = {
                             result: result
                         };
 
-                        totalTimeInExec += result.runningTime;
 
                         codeExecutionResult.checkResults.push(responseResult);
                         callback();
                     }
                 });
             }, function (errEach) {
-                self._logger.info('Total exec time: ' + totalTimeInExec);
                 return done(errEach, codeExecutionResult);
             });
         });
