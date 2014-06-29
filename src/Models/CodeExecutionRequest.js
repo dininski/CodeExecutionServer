@@ -1,20 +1,22 @@
 "use strict";
 
 var CodeExecutionRequest = function () {
-    this.id = 0;
-    this.executionId = '';
-
+    this.executionId = 0;
     this.language = '';
     this.options = {};
+    this.timeLimit = 0;
+    this.stdin = '';
+    this.userCode = '';
+    this.executorId = 0;
 };
 
 CodeExecutionRequest.prototype = {
-    init: function (id, language, executionId, options) {
-        this.id = id;
+    init: function (executorId, executionId, timeLimit, stdin, userCode) {
         this.executionId = executionId;
-
-        this.language = language;
-        this.options = options;
+        this.timeLimit = timeLimit;
+        this.stdin = stdin;
+        this.userCode = userCode;
+        this.executorId = executorId;
     }
 };
 

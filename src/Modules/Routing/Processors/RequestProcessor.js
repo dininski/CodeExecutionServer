@@ -1,7 +1,6 @@
 'use strict';
 
 var CodeExecutionRequest = require('../../../Models/CodeExecutionRequest');
-var CodeExecutionRequestOptions = require('../../../Models/CodeExecutionRequestOptions');
 var Utilities = require('../../../Common/Utilities');
 var Config = require('../../../Common/Config');
 var Constants = require('../../../Common/Constants');
@@ -16,12 +15,17 @@ var RequestProcessor = function () {
 
 RequestProcessor.prototype = {
     processCodeRequest: function (req, res, done) {
-        var payload = req.files.payload;
-        var executionId = Utilities.generateGuid();
-        var baseFolder = Config.ExecutionConfig.baseFolder + '/' + executionId;
+        var executorId = req.params.executorId;
+        var userCodeBase64 = req.body.userCode;
+        var stdinBase64 = req.body.stdin;
+        var executionId = req.body.id;
+        var timeLimit = req.body.timeLimit;
 
-        var zip = new AdmZip(payload.path);
-        zip.extractAllTo(baseFolder, true);
+        var codeExecutionRequest = new CodeExecutionRequest();
+        codeExecutionRequest.init(executorId, executionId, timeLimit, stdinBase64, userCodeBase64);
+
+        var executionIdInternal = Utilities.generateGuid();
+        var baseFolder = Config.ExecutionConfig.baseFolder + '/' + executionIdInternal;
 
         async.waterfall([
             function createExecutionDir(callback) {
@@ -33,13 +37,7 @@ RequestProcessor.prototype = {
                 fs.readFile(userCodeFile, callback);
             },
 
-// TODO add inflate
-//            function onUserCodeReadDlg(buffer, callback) {
-//                zlib.inflate(buffer, callback);
-//            },
-
             function onCodeInflatedDlg(code, callback) {
-
                 var userCode = code.toString('utf8');
                 var userCodeFile = getUserCodeFolder(baseFolder);
 
@@ -57,12 +55,6 @@ RequestProcessor.prototype = {
                 var timeLimit = req.body.timeLimit;
                 var memoryLimit = req.body.memoryLimit;
                 var executionFolder = getExecutionFolder(baseFolder);
-
-                var options = new CodeExecutionRequestOptions();
-                options.init(timeLimit, memoryLimit, executionFolder);
-
-                var codeExecutionRequest = new CodeExecutionRequest();
-                codeExecutionRequest.init(id, language, executionId, options);
 
                 var checkProvider = new CodeCheckProvider();
 

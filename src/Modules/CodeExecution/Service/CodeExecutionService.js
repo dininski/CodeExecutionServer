@@ -16,10 +16,10 @@ CodeExecutionService.prototype = {
 
     execute: function (codeExecutionRequest, checkProvider, done) {
         var codeExecutionResult = new CodeExecutionResult();
-        this._executeSingleWorker(codeExecutionRequest, checkProvider, codeExecutionResult, done);
+        this._executeInternal(codeExecutionRequest, checkProvider, codeExecutionResult, done);
     },
 
-    _executeSingleWorker: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
+    _executeInternal: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
         var self = this;
         var executor = self._executorFactory.getExecutor(codeExecutionRequest.language);
         var executionStartTime;

@@ -20,7 +20,7 @@ Routing.prototype = {
     registerRoutes: function () {
         this._httpServer.registerRoute({
             method: 'post',
-            path: '/execute',
+            path: '/executors/:executorId/execute',
             handler: this.handleCodeExecuteRequest.bind(this)
         });
     },
