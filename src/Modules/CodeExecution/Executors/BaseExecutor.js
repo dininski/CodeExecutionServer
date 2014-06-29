@@ -1,6 +1,7 @@
 'use strict';
 
 var async = require('async');
+var SimpleStream = require('./SimpleStream');
 
 var BaseExecutor = function () {
     this._containerFactory = {};
@@ -9,6 +10,11 @@ var BaseExecutor = function () {
     this._container = {};
     this._id = '';
     this.timeLimit = 0;
+    this.stdOut = null;
+    this.stdErr = null;
+    this.codeExecutionRequest = null;
+    this._executionStart = null;
+
 };
 
 BaseExecutor.prototype = {
@@ -19,8 +25,18 @@ BaseExecutor.prototype = {
         this._logger = logger;
     },
 
-    initializeExecution: function (done) {
+    initializeExecution: function (codeExecutionRequest, done) {
+        this.codeExecutionRequest = codeExecutionRequest;
+        this.timeLimit = this.codeExecutionRequest.timeLimit;
+
+        var binds = [];
+        binds.push(this.codeExecutionRequest.executionFolder + ":/executionFolder");
         var self = this;
+
+        // TODO: add as option
+        this._containerCreateOptions.Memory = this.codeExecutionRequest.memoryLimit || 5000000;
+
+        this._containerRunOptions.Binds = binds;
         this._containerFactory.createContainer(this._containerCreateOptions, function (err, container) {
             if (err) {
                 done(err);
@@ -36,96 +52,71 @@ BaseExecutor.prototype = {
         this._container.start(this._containerRunOptions, done);
     },
 
-    execute: function (stdinContent, executionOptions, done) {
+    execute: function (done) {
         var self = this;
-
-        this._containerCreateOptions.Memory = executionOptions.memoryLimit;
-        var timeLimit = executionOptions.timeLimit;
-        var binds = [];
-        binds.push(executionOptions.executionFolder + ":/executionFolder");
-        this._containerRunOptions.Binds = binds;
-
-        async.waterfall([
-            function createContainerDlg(callback) {
-                BaseExecutor.prototype.initializeExecution.call(self, callback);
-            },
-
-            function onContainerCreateDlg(callback) {
-                self._container.getWriteStream(callback);
-            },
-
-            function onContainerStreamReadyDlg(stream, callback) {
-                self.writeStdin(stream, stdinContent, callback);
-            },
-
-            function onContainerCreateDlg(callback) {
-                self._container.getReadStream(callback);
-            },
-
-            function onContainerCreateDlg(stream, callback) {
-                self.attachToOutput(stream, callback, done);
-            },
-
-            function containerStartDlg(callback) {
-                BaseExecutor.prototype.beginExecution.call(self, callback);
-                self._logger.info('Execution started!');
-            }
-
-        ], function onExecuteErrorDlg(err) {
+        this.stdOut = new SimpleStream();
+        this.stdErr = new SimpleStream();
+        this._logger.info('Started new execution');
+        this.getStream(function (err, stream) {
             if (err) {
-                self._logger.error(err);
+                return done(err);
             }
+
+            var stdinContent = new Buffer(self.codeExecutionRequest.stdin, 'base64').toString('utf8');
+            self.processStream(stream, stdinContent, function () {
+
+            });
+
+            self.beginExecution(function (err, container) {
+                self._logger.info('Container started!');
+                self.executionFinished(function onExecuteErrorDlg(err) {
+                    if (err) {
+                        self._logger.error(err);
+                        return done(err);
+                    }
+
+                    var result = {
+                        stdOut: self.stdOut.value,
+                        stdErr: self.stdErr.value
+                    };
+
+                    return done(null, result);
+                });
+            });
         });
     },
 
-    recycle: function (done) {
-        this._container.restart(done);
+    getStream: function (done) {
+        this._container.getStream(done);
     },
 
-    writeStdin: function (stream, args, done) {
-        stream.write(args, function writeStdinDlg() {
+    processStream: function (stream, stdin, done) {
+        var self = this;
+        this._container.demuxStream(stream, this.stdOut, this.stdErr);
+        stream.write(stdin, function writeStdinDlg() {
+            self._logger.info('Wrote stdin');
             done();
         });
     },
 
-    attachToOutput: function (stream, callback, done) {
-        var stdout;
-        var stderr;
+    executionFinished: function (callback) {
         var self = this;
 
-
-        this._container.wait(function onStreamEndDlg() {
-            var result = {
-                stdout: stdout.value,
-                stderr: stderr.value
-            };
-
-            BaseExecutor.prototype._cleanup.call(self, result, done);
+        this._container.wait(function (err, data) {
+            self._container.inspect(function (err, data) {
+                self._executionStart = new Date(data.State.StartedAt);
+                self._executionEnd = new Date(data.State.FinishedAt);
+                callback();
+            });
         });
-
-        this._container.demuxStream(stream, function onStreamProcessDlg(stdoutStream, stderrStream) {
-            stdout = stdoutStream;
-            stderr = stderrStream;
-        });
-
-        callback();
     },
 
-    _cleanup: function (result, done) {
-        var self = this;
+    cleanup: function (done) {
+        this._container.remove(done);
+    },
 
-        self._logger.info('Execution finished!');
-
-        async.waterfall([
-            function killContainerDlg(callback) {
-                self._container.kill(callback);
-            },
-            function removeContainerDlg(data, callback) {
-                self._container.remove(callback);
-            }
-        ], function (err) {
-            done(err, result);
-        });
+    getExecutionTime: function () {
+        return this._executionEnd - this._executionStart;
     }
 };
 
