@@ -1,9 +1,6 @@
 'use strict';
 
-// var ReadableStream = require('readable-stream');
-var StreamMock = require('./StreamMock');
-
-var Container = function (options) {
+var Container = function () {
     this._dockerContainer = null;
 };
 
@@ -29,23 +26,31 @@ Container.prototype = {
     },
 
     getStream: function (done) {
-        // TODO extract in constants/config
-        this._dockerContainer.attach({stream: true, stdin: true, stdout: true, stderr: true, tty: false}, done);
-    },
-
-    demuxStream: function (stream, done) {
-        var stdout = new StreamMock();
-        var stderr = new StreamMock();
-        this._dockerContainer.modem.demuxStream(stream, stdout, stderr);
-        done(stdout, stderr);
-    },
-
-    getOutput: function (opts, done) {
-        this._dockerContainer.attach(opts, done);
+        this._getStreamInternal({stream: true, stdin: true, stdout: true, stderr: true, tty: false}, done);
     },
 
     getReadStream: function (done) {
-        this._dockerContainer.attach({stream: true, stdout: true, stderr: true, tty: false}, done);
+        this._getStreamInternal({stream: true, stdout: true, stderr: true, tty: false}, done);
+    },
+
+    demuxStream: function (stream, stdout, stderr) {
+        this._dockerContainer.modem.demuxStream(stream, stdout, stderr);
+    },
+
+    _getStreamInternal: function (opts, done) {
+        this._dockerContainer.attach(opts, done);
+    },
+
+    wait: function (done) {
+        this._dockerContainer.wait(done);
+    },
+
+    inspect: function (done) {
+        this._dockerContainer.inspect(done);
+    },
+
+    logs: function (opts, done) {
+        this._dockerContainer.logs(opts, done);
     }
 };
 

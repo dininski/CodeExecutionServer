@@ -12,47 +12,47 @@ var Config = {
         }
     },
     ExecutionConfig: {
-        Python: {
-            createOptions: {
-                "AttachStdin": true,
-                "AttachStdout": true,
-                "AttachStderr": true,
-                "Tty": false,
-                "OpenStdin": true,
-                "StdinOnce": true,
-                "Cmd": [
-                    "/bin/sh",
-                    "-c",
-                    "python3.3 userFile"
-                ],
-                "Image": "codeExecution:python3.3",
-                "Volumes": {
-                    "/executionFolder": {}
+        Executors: {
+            Python: {
+                createOptions: {
+                    "AttachStdin": true,
+                    "AttachStdout": true,
+                    "AttachStderr": true,
+                    "Tty": false,
+                    "OpenStdin": true,
+                    "StdinOnce": true,
+                    "Cmd": [
+                        "/usr/binpython3.3",
+                        "userFile"
+                    ],
+                    "Image": "codeExecution:python3.3",
+                    "Volumes": {
+                        "/executionFolder": {}
+                    },
+                    "WorkingDir": "/executionFolder"
                 },
-                "WorkingDir": "/executionFolder"
+                runOptions: {}
             },
-            runOptions: {}
-        },
-        Php: {
-            createOptions: {
-                "AttachStdin": true,
-                "AttachStdout": true,
-                "AttachStderr": true,
-                "Tty": false,
-                "OpenStdin": true,
-                "StdinOnce": true,
-                "Cmd": [
-                    "/bin/sh",
-                    "-c",
-                    "php userFile"
-                ],
-                "Image": "codeExecution:php5",
-                "Volumes": {
-                    "/executionFolder": {}
+            Php: {
+                createOptions: {
+                    "AttachStdin": true,
+                    "AttachStdout": true,
+                    "AttachStderr": true,
+                    "Tty": false,
+                    "OpenStdin": true,
+                    "StdinOnce": true,
+                    "Cmd": [
+                        "/usr/bin/php",
+                        "userFile"
+                    ],
+                    "Image": "codeExecution:php5",
+                    "Volumes": {
+                        "/executionFolder": {}
+                    },
+                    "WorkingDir": "/executionFolder"
                 },
-                "WorkingDir": "/executionFolder"
-            },
-            runOptions: {}
+                runOptions: {}
+            }
         },
         baseFolder: '/home/vasil/tmp'
         //baseFolder: 'd:\\crap\\baseFolder'

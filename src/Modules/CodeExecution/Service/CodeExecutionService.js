@@ -8,72 +8,35 @@ var CodeExecutionService = function () {
 };
 
 CodeExecutionService.prototype = {
-    init: function (executorFactory, metricsProvider) {
+    init: function (executorFactory, metricsProvider, logger) {
+        this._logger = logger;
         this._executorFactory = executorFactory;
-        this._metricsProvider = metricsProvider;
     },
 
-    execute: function (codeExecutionRequest, checkProvider, done) {
-        var codeExecutionResult = new CodeExecutionResult();
-        this._executeParallel(codeExecutionRequest, checkProvider, codeExecutionResult, done);
+    execute: function (codeExecutionRequest, done) {
+        this._executeInternal(codeExecutionRequest, done);
     },
 
-    _executeParallel: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
+    _executeInternal: function (codeExecutionRequest, done) {
         var self = this;
-        checkProvider.getChecksAsString(function (err, checks) {
-            async.each(checks, function (check, callback) {
-                var executor = self._executorFactory.getExecutor(codeExecutionRequest.language);
-                executor.execute(check, codeExecutionRequest.options, function (err, result) {
-                    if (err) {
-                        callback(err);
-                    } else {
-                        var executionMetrics = self._metricsProvider.getMetricsForContainer(executor._id);
-                        var runningTime = executionMetrics.die - executionMetrics.start;
-                        result.runningTime = runningTime;
+        var executor = self._executorFactory.getExecutor(codeExecutionRequest.executorId);
+        executor.initializeExecution(codeExecutionRequest, function (err) {
+            self._logger.info('Initialized execution');
+            if (err) {
+                self._logger.error(err);
+            }
 
-                        var responseResult = {
-                            result: result
-                        };
+            executor.execute(function(err, result) {
+                if (err) {
+                    self._logger.error(err);
+                    return done(err);
+                }
 
-                        codeExecutionResult.checkResults.push(responseResult);
-                        callback();
-                    }
-                });
-            }, function (errEach) {
-                return done(errEach, codeExecutionResult);
+                result.runningTime = executor.getExecutionTime();
+
+                done(null, result);
             });
         });
-    },
-
-    _execute: function (codeExecutionRequest, checkProvider, codeExecutionResult, done) {
-        var self = this;
-        if (checkProvider.hasChecks()) {
-            checkProvider.getCheck(function (err, check) {
-                if (err) {
-                    done(err);
-                } else {
-                    var executor = self._executorFactory.getExecutor(codeExecutionRequest.language);
-                    executor.execute(check, codeExecutionRequest.options, function (err, result) {
-                        if (err) {
-                            done(err);
-                        } else {
-                            var executionMetrics = self._metricsProvider.getMetricsForContainer(executor._id);
-                            var runningTime = executionMetrics.die - executionMetrics.start;
-                            result.runningTime = runningTime;
-
-                            var responseResult = {
-                                result: result
-                            };
-
-                            codeExecutionResult.checkResults.push(responseResult);
-                            self._execute(codeExecutionRequest, checkProvider, codeExecutionResult, done);
-                        }
-                    });
-                }
-            });
-        } else {
-            done(null, codeExecutionResult);
-        }
     }
 };
 
