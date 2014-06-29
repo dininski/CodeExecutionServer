@@ -5,7 +5,7 @@ var http = require('http');
 
 var allowCrossDomain = function(req, res, next) {
     var responseSettings = {
-        "AccessControlAllowOrigin": req.headers.origin,
+        "AccessControlAllowOrigin": "*",
         "AccessControlAllowHeaders": "Content-Type,X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5,  Date, X-Api-Version, X-File-Name",
         "AccessControlAllowMethods": "POST, GET, PUT, DELETE, OPTIONS",
         "AccessControlAllowCredentials": true
