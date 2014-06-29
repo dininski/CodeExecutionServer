@@ -11,12 +11,13 @@ var CodeExecutionRequest = function () {
 };
 
 CodeExecutionRequest.prototype = {
-    init: function (executorId, executionId, timeLimit, stdin, userCode) {
-        this.executionId = executionId;
-        this.timeLimit = timeLimit;
+    init: function (executorId, executionId, timeLimit, stdin, userCode, executionFolder) {
+        this.executionId = +executionId;
+        this.timeLimit = +timeLimit;
         this.stdin = stdin;
         this.userCode = userCode;
-        this.executorId = executorId;
+        this.executorId = +executorId;
+        this.executionFolder = executionFolder;
     }
 };
 

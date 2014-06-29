@@ -21,58 +21,30 @@ RequestProcessor.prototype = {
         var executionId = req.body.id;
         var timeLimit = req.body.timeLimit;
 
-        var codeExecutionRequest = new CodeExecutionRequest();
-        codeExecutionRequest.init(executorId, executionId, timeLimit, stdinBase64, userCodeBase64);
-
         var executionIdInternal = Utilities.generateGuid();
-        var baseFolder = Config.ExecutionConfig.baseFolder + '/' + executionIdInternal;
+        var executionFolder = Config.ExecutionConfig.baseFolder + '/' + executionIdInternal;
+
+        var codeExecutionRequest = new CodeExecutionRequest();
+        codeExecutionRequest.init(executorId, executionId, timeLimit, stdinBase64, userCodeBase64, executionFolder);
 
         async.waterfall([
             function createExecutionDir(callback) {
-                fs.mkdir(getExecutionFolder(baseFolder), callback);
+                fs.mkdir(executionFolder, callback);
             },
 
-            function getUserCodeFileDlg(callback) {
-                var userCodeFile = baseFolder + '/userCode.deflate';
-                fs.readFile(userCodeFile, callback);
-            },
-
-            function onCodeInflatedDlg(code, callback) {
-                var userCode = code.toString('utf8');
-                var userCodeFile = getUserCodeFolder(baseFolder);
-
-                fs.writeFile(userCodeFile, userCode, function (err) {
-                    callback(err);
-                });
+            function saveUserCodeDlg(callback) {
+                var userCodeBuffer = new Buffer(userCodeBase64, 'base64').toString('utf8');
+                var userCodeFileLocation = executionFolder + '/userFile';
+                fs.writeFile(userCodeFileLocation, userCodeBuffer, callback);
             }
         ], function onProcessingCompeletedDlg(err) {
             if (err) {
                 done(err);
             } else {
-                var id = +req.body.id;
-                var language = +req.body.language;
-
-                var timeLimit = req.body.timeLimit;
-                var memoryLimit = req.body.memoryLimit;
-                var executionFolder = getExecutionFolder(baseFolder);
-
-                var checkProvider = new CodeCheckProvider();
-
-                var checksFolder = baseFolder + '/tests';
-                checkProvider.init(checksFolder, function (err) {
-                    done(err, codeExecutionRequest, checkProvider);
-                });
+                done(null, codeExecutionRequest);
             }
         });
     }
 };
-
-function getExecutionFolder(baseFolder) {
-    return baseFolder + Constants.Execution.baseFolder;
-}
-
-function getUserCodeFolder(baseFolder) {
-    return baseFolder + Constants.Execution.baseFolder + '/' + Constants.Execution.userFile;
-}
 
 module.exports = RequestProcessor;

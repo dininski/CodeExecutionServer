@@ -20,7 +20,7 @@ Routing.prototype = {
     registerRoutes: function () {
         this._httpServer.registerRoute({
             method: 'post',
-            path: '/executors/:executorId/execute',
+            path: '/executors/:executorId(\\d+)/execute',
             handler: this.handleCodeExecuteRequest.bind(this)
         });
     },
@@ -32,8 +32,8 @@ Routing.prototype = {
                 self.requestProcessor.processCodeRequest(req, res, callback);
             },
 
-            function executeCodeDlg(codeExecutionRequest, checkProvider, callback) {
-                self._codeExecutionService.execute(codeExecutionRequest, checkProvider, callback);
+            function executeCodeDlg(codeExecutionRequest, callback) {
+                self._codeExecutionService.execute(codeExecutionRequest, callback);
             },
 
             function onAllChecksRunDlg(result, callback) {

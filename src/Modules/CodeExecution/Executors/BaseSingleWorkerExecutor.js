@@ -10,6 +10,11 @@ var BaseSingleWorkerExecutor = function () {
     this._container = {};
     this._id = '';
     this.timeLimit = 0;
+    this.stdOut = null;
+    this.stdErr = null;
+    this.codeExecutionRequest = null;
+    this._executionStart = null;
+
 };
 
 BaseSingleWorkerExecutor.prototype = {
@@ -18,18 +23,18 @@ BaseSingleWorkerExecutor.prototype = {
         this._containerCreateOptions = containerCreateOptions;
         this._containerRunOptions = containerRunOptions;
         this._logger = logger;
-        this._firstRun = true;
-        this._executionStart = null;
-        this.stdOut = null;
-        this.stdErr = null;
     },
 
-    initializeExecution: function (executionOptions, done) {
+    initializeExecution: function (codeExecutionRequest, done) {
+        this.codeExecutionRequest = codeExecutionRequest;
+        this.timeLimit = this.codeExecutionRequest.timeLimit;
+
         var binds = [];
-        binds.push(executionOptions.executionFolder + ":/executionFolder");
+        binds.push(this.codeExecutionRequest.executionFolder + ":/executionFolder");
         var self = this;
-        this._containerCreateOptions.Memory = executionOptions.memoryLimit;
-        this._timeLimit = executionOptions.timeLimit;
+
+        // TODO: add as option
+        this._containerCreateOptions.Memory = this.codeExecutionRequest.memoryLimit || 5000000;
 
         this._containerRunOptions.Binds = binds;
         this._containerFactory.createContainer(this._containerCreateOptions, function (err, container) {
@@ -44,23 +49,24 @@ BaseSingleWorkerExecutor.prototype = {
     },
 
     beginExecution: function (done) {
-        if (this._firstRun) {
-            this._firstRun = false;
-            this._container.start(this._containerRunOptions, done);
-        } else {
-            this._container.restart(done);
-        }
+        this._container.start(this._containerRunOptions, done);
     },
 
-    execute: function (stdinContent, cleanup, done) {
+    execute: function (done) {
         var self = this;
         this.stdOut = new SimpleStream();
         this.stdErr = new SimpleStream();
         this._logger.info('Started new execution');
         this.getStream(function (err, stream) {
+            if (err) {
+                return done(err);
+            }
+
+            var stdinContent = new Buffer(self.codeExecutionRequest.stdin, 'base64').toString('utf8');
             self.processStream(stream, stdinContent, function () {
 
             });
+
             self.beginExecution(function (err, container) {
                 self._logger.info('Container started!');
                 self.executionFinished(function onExecuteErrorDlg(err) {
@@ -84,10 +90,10 @@ BaseSingleWorkerExecutor.prototype = {
         this._container.getStream(done);
     },
 
-    processStream: function (stream, args, done) {
+    processStream: function (stream, stdin, done) {
         var self = this;
         this._container.demuxStream(stream, this.stdOut, this.stdErr);
-        stream.write(args, function writeStdinDlg() {
+        stream.write(stdin, function writeStdinDlg() {
             self._logger.info('Wrote stdin');
             done();
         });
