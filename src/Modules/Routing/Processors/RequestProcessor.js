@@ -4,9 +4,6 @@ var CodeExecutionRequest = require('../../../Models/CodeExecutionRequest');
 var Utilities = require('../../../Common/Utilities');
 var Config = require('../../../Common/Config');
 var Constants = require('../../../Common/Constants');
-var AdmZip = require('adm-zip');
-var CodeCheckProvider = require('./CodeCheckProvider');
-var zlib = require('zlib');
 var async = require('async');
 var fs = require('fs');
 
