@@ -7,9 +7,8 @@ var CodeExecutionService = function () {
 };
 
 CodeExecutionService.prototype = {
-    init: function (executorFactory, metricsProvider, logger) {
+    init: function (logger) {
         this._logger = logger;
-        this._executorFactory = executorFactory;
     },
 
     execute: function (codeExecutionRequest, done) {
@@ -18,6 +17,7 @@ CodeExecutionService.prototype = {
 
     _executeInternal: function (codeExecutionRequest, done) {
         var self = this;
+
         var executor = self._executorFactory.getExecutor(codeExecutionRequest.executorId);
         executor.initializeExecution(codeExecutionRequest, function (err) {
             self._logger.info('Initialized execution');

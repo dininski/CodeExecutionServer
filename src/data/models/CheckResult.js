@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var ObjectId = mongoose.ObjectId;
+var ObjectId = Schema.ObjectId;
 var validators = require('../validators');
 
 var CheckResultSchema = new Schema({

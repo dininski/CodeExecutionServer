@@ -5,7 +5,9 @@ var Schema = mongoose.Schema;
 
 var TaskSchema = new Schema({
     _id: String,
-    Description: String
+    description: String,
+    memoryLimit: Number,
+    timeLimit: Number
 });
 
 mongoose.model('Task', TaskSchema);

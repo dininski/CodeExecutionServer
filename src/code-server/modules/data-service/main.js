@@ -1,10 +1,9 @@
 'use strict';
 
 module.exports = function (options, imports, register) {
-    var Data = require('./Data');
-    var Models = new Data();
+    var DataService = require('./data-service');
 
     register(null, {
-        Data: Models
+        dataService: DataService
     });
 };

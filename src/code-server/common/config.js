@@ -21,7 +21,7 @@ var Config = {
                         "/usr/binpython3.3",
                         "userFile"
                     ],
-                    "Image": "codeExecution:python3.3",
+                    "Image": "code-execution.python",
                     "Volumes": {
                         "/executionFolder": {}
                     },
@@ -41,7 +41,7 @@ var Config = {
                         "/usr/bin/php",
                         "userFile"
                     ],
-                    "Image": "codeExecution:php5",
+                    "Image": "code-execution.php",
                     "Volumes": {
                         "/executionFolder": {}
                     },

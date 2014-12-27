@@ -1,14 +1,26 @@
 'use strict';
 
-var Container = function (container) {
-    if(!container) {
-        throw 'No container provided';
-    }
+var containerFactory = require('./container-factory');
 
-    this._dockerContainer = container;
+var Container = function (options) {
+    this.options = options;
+    this._dockerContainer = null;
 };
 
 Container.prototype = {
+    init: function(done) {
+        var self = this;
+
+        containerFactory.createContainer(this.options, function(err, container) {
+            if(err) {
+                return done(err);
+            }
+
+            self._dockerContainer = container;
+            done();
+        });
+    },
+
     start: function (opts, done) {
         this._dockerContainer.start(opts, done);
     },
@@ -51,6 +63,10 @@ Container.prototype = {
 
     logs: function (opts, done) {
         this._dockerContainer.logs(opts, done);
+    },
+
+    getId: function() {
+        return this._dockerContainer.id;
     }
 };
 

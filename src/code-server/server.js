@@ -15,8 +15,7 @@ CodeExecutionServer.prototype = {
             if (err) {
                 console.log(err.stack);
             } else {
-                var httpServer = app.services.HttpServer;
-                httpServer.start(Config.Http.port);
+                app.services.codeExecutionService.start();
             }
         });
     }

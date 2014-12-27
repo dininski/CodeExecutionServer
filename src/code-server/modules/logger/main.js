@@ -5,6 +5,6 @@ module.exports = function setup(options, imports, register) {
     var logger = new Logger();
 
     register(null, {
-        Logger: logger
+        logger: logger
     });
 }
