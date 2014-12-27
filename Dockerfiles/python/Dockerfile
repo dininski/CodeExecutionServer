@@ -1,4 +1,4 @@
-FROM codeExecution:base
+FROM code-execution.base
 
 MAINTAINER Vasil Dininski
 
