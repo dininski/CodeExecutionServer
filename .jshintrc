@@ -13,6 +13,7 @@
   "bitwise": true,
   "curly": true,
   "undef": true,
+  "unused": true,
   "nonew": true,
   "forin": true,
   "camelcase": true
