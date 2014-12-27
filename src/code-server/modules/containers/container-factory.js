@@ -20,16 +20,14 @@ ContainerFactory.prototype = {
                 return done(err);
             }
 
-            var container = new Container(self._logger);
-            container.init(dockerContainer);
+            var container = new Container(dockerContainer);
             done(null, container);
         });
     },
 
     getContainerById: function (id) {
-        var container = new Container();
         var dockerContainer = this._dockerode.getContainer(id);
-        container.init(dockerContainer);
+        var container = new Container(dockerContainer);
         return container;
     }
 };

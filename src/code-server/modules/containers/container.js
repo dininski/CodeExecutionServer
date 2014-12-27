@@ -1,14 +1,14 @@
 'use strict';
 
-var Container = function () {
-    this._dockerContainer = null;
+var Container = function (container) {
+    if(!container) {
+        throw 'No container provided';
+    }
+
+    this._dockerContainer = container;
 };
 
 Container.prototype = {
-    init: function (container) {
-        this._dockerContainer = container;
-    },
-
     start: function (opts, done) {
         this._dockerContainer.start(opts, done);
     },

@@ -1,0 +1,9 @@
+{
+    "name": "Data",
+    "version": "0.1",
+    "main": "main.js",
+    "plugin": {
+        "consumes": [],
+        "provides": ["Data"]
+    }
+}
