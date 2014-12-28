@@ -2,7 +2,6 @@
 
 var architect = require('architect');
 var path = require('path');
-var Config = require('./common/config');
 
 var CodeExecutionServer = function () {
 };

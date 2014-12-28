@@ -1,10 +1,12 @@
 'use strict';
 
 var _ = require('lodash');
+var async = require('async');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var validators = require('../validators');
+var compactor = require('../compactor');
 
 var CheckResultSchema = new Schema({
     stdOut: Buffer,
@@ -27,5 +29,7 @@ var executionResults = _.values(executionResultsMap);
 CheckResultSchema
     .path('executionResult')
     .validate(validators.rangeValidator(executionResults), 'Invalid execution result!');
+
+compactor.compact(CheckResultSchema, ['stdOut', 'stdErr']);
 
 mongoose.model('CheckResult', CheckResultSchema);

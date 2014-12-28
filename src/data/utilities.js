@@ -9,8 +9,7 @@ module.exports = {
                 return callback(err);
             }
 
-            field = buffer;
-            callback();
+            callback(null, buffer);
         });
     },
     inflateField: function (field, callback) {
@@ -19,8 +18,8 @@ module.exports = {
                 return callback(err);
             }
 
-            field = buffer.toString('base64');
-            callback();
+            var stringValue = buffer.toString('base64');
+            callback(null, stringValue);
         });
     }
 };

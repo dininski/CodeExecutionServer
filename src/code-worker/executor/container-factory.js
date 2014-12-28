@@ -6,5 +6,7 @@ var dockerode = new Docker({
 });
 
 module.exports = {
-    createContainer: dockerode.createContainer.bind(dockerode)
+    createContainer: function() {
+        return dockerode.createContainer.apply(dockerode, arguments);
+    }
 };

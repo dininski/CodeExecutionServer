@@ -16,5 +16,6 @@
   "unused": true,
   "nonew": true,
   "forin": true,
-  "camelcase": true
+  "camelcase": true,
+  "quotmark": true
 }

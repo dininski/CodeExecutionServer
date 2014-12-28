@@ -28,52 +28,68 @@ CodeExecutionService.prototype = {
         //setInterval(function() {
         var Submission = self.dataService.get('Submission');
         var submission = new Submission();
-        submission.code = "<?php\
-        function solve() {\
-            // Read input data\
-            $X = (float) fgets(STDIN);\
-            $Y = (float) fgets(STDIN);\
-            // Solve the problem\
-            if ($X == 0 && $Y == 0) {\
-                return 0;\
-            } else if ($X == 0) {\
-                return 5;\
-            } else if ($Y == 0) {\
-                return 6;\
-            } else if ($X > 0 && $Y > 0) {\
-                return 1;\
-            } else if ($X < 0 && $Y > 0) {\
-                return 2;\
-            } else if ($X < 0 && $Y < 0) {\
-                return 3;\
-            } else {\
-                return 4;\
-            }\
-        }\
-        echo solve();\
-        ?>";
+        submission.code = '<?php\n\
+        function solve() {\n\
+            // Read input data\n\
+            $X = (float) fgets(STDIN);\n\
+            $Y = (float) fgets(STDIN);\n\
+            // Solve the problem\n\
+            if ($X == 0 && $Y == 0) {\n\
+                return 0;\n\
+            } else if ($X == 0) {\n\
+                return 5;\n\
+            } else if ($Y == 0) {\n\
+                return 6;\n\
+            } else if ($X > 0 && $Y > 0) {\n\
+                return 1;\n\
+            } else if ($X < 0 && $Y > 0) {\n\
+                return 2;\n\
+            } else if ($X < 0 && $Y < 0) {\n\
+                return 3;\n\
+            } else {\n\
+                return 4;\n\
+            }\n\
+        }\n\
+        echo solve();\n\
+        ?>';
 
-        var executor = new Executor(self.logger);
-        var executorOptions = _.defaults({
-            'Cmd': [
-                '/usr/bin/php',
-                'userFile'
-            ],
-            'Image': 'code-execution.php'
-        }, defaultOptions);
+        var executionId = Math.random();
 
-        executor.init(executorOptions);
+        var executionFolder = '/tmp/' + executionId;
 
-        executor.initializeExecution(submission, function(err) {
-            if(err) {
-                self.logger.info(err)
-            }
+        var fs = require('fs');
+
+        fs.mkdir(executionFolder, function(err) {
+            console.log(err);
+            fs.writeFile(executionFolder + '/userFile', submission.code, function(err) {
+                console.log(err);
+                var executor = new Executor(self.logger);
+                var executorOptions = _.defaults({
+                    'Cmd': [
+                        '/usr/bin/php',
+                        'userFile'
+                    ],
+                    'Image': 'code-execution.php'
+                }, defaultOptions);
+
+                executor.init(executorOptions);
+
+                var a = {
+                    code: submission.code,
+                    executionFolder: executionFolder
+                };
+
+                executor.initializeExecution(a, function (err) {
+                    if (err) {
+                        self.logger.info(err);
+                    }
+
+                    executor.execute(function(err, result) {
+                        self.logger.info(result, 'Execution result');
+                    });
+                });
+            });
         });
-
-        //Submission.findOneAndUpdate({state: 0}, {state: 1}, null, function (err, submission) {
-        //
-        //});
-        //}, 1000);
     }
 };
 

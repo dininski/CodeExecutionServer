@@ -49,8 +49,7 @@ Executor.prototype = {
                 return done(err);
             }
 
-            var stdinContent = new Buffer(self.codeExecutionRequest.code, 'base64').toString('utf8');
-            self.processStream(stream, stdinContent, function () {
+            self.processStream(stream, '1\n2\n', function () {
 
             });
 

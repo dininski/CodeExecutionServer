@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var utilities = require('../utilities');
+var compactor = require('../compactor');
 var validators = require('../validators');
 
 var SubmissionSchema = new Schema({
@@ -33,14 +33,7 @@ SubmissionSchema.pre('save', function (next) {
     var self = this;
 
     this.state = this.state || 0;
-
-    utilities.deflateField(self.code, next);
 });
 
-SubmissionSchema.post('read', function (next) {
-    var self = this;
-
-    utilities.inflateField(self.code, next);
-});
-
+compactor.compact(SubmissionSchema, ['code']);
 mongoose.model('Submission', SubmissionSchema);
